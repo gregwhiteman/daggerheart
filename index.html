@@ -34,6 +34,63 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        @keyframes diceRoll {
+            0% { transform: scale(0.8) rotate(-10deg); opacity: 0.5; }
+            50% { transform: scale(1.1) rotate(10deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .dice-roll-animation {
+            animation: diceRoll 0.5s ease-out;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 0 auto;
+        }
+
+        .score-circle.hope-higher {
+            border-color: #ffffff;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.2));
+            color: #ffffff;
+        }
+
+        .score-circle.fear-higher {
+            border-color: #000000;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
+            color: #e5e7eb;
+        }
+
+        .score-circle.critical {
+            border-color: #eab308;
+            background: linear-gradient(135deg, rgba(234, 179, 8, 0.2), rgba(234, 179, 8, 0.3));
+            color: #eab308;
+            box-shadow: 0 0 20px rgba(234, 179, 8, 0.5);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(234, 179, 8, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(234, 179, 8, 0.8); }
+        }
+
+        .critical-label {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: #eab308;
+            text-shadow: 0 0 10px rgba(234, 179, 8, 0.5);
+        }
     </style>
 </head>
 <body class="bg-zinc-950 text-zinc-200 min-h-screen">
@@ -73,8 +130,59 @@
             </p>
         </div> -->
 
-        <!-- Input Form -->
+        <!-- Hope & Fear Dice Roller -->
         <div class="bg-zinc-900 border border-zinc-700 rounded-3xl p-10 shadow-2xl max-w-2xl mx-auto">
+            <h2 class="text-2xl font-bold title-font mb-6 text-center text-white">
+                Hope & Fear Roll
+            </h2>
+            <div class="text-center mb-8">
+                <button 
+                    onclick="rollHopeFear()"
+                    class="bg-gradient-to-r from-white to-zinc-900 hover:from-zinc-100 hover:to-black text-white font-bold text-xl py-6 px-12 rounded-3xl transition-all duration-300 flex items-center justify-center gap-3 shadow-xl shadow-white/20 mx-auto">
+                    <i class="fa-solid fa-dice"></i>
+                    ROLL HOPE & FEAR
+                </button>
+            </div>
+            <div id="dice-results" class="hidden">
+                <div class="grid grid-cols-2 gap-6 mt-8">
+                    <div class="bg-zinc-950 border-2 border-white rounded-3xl p-8 text-center">
+                        <div class="text-sm uppercase tracking-widest text-white mb-3">HOPE</div>
+                        <div id="hope-value" class="text-6xl font-bold text-white mb-2">-</div>
+                        <div class="text-xs text-zinc-500 font-mono">D12</div>
+                    </div>
+                    <div class="bg-black border-2 border-zinc-900 rounded-3xl p-8 text-center">
+                        <div class="text-sm uppercase tracking-widest text-zinc-300 mb-3">FEAR</div>
+                        <div id="fear-value" class="text-6xl font-bold text-zinc-200 mb-2">-</div>
+                        <div class="text-xs text-zinc-500 font-mono">D12</div>
+                    </div>
+                </div>
+                
+                <!-- Icon Indicator and Total Score -->
+                <div class="mt-8 flex flex-col items-center gap-6">
+                    <!-- Icon (Skull or Dove or Lightning) -->
+                    <div id="result-icon" class="text-6xl flex items-center justify-center"></div>
+                    
+                    <!-- Critical Label -->
+                    <div id="critical-label" class="critical-label hidden"></div>
+                    
+                    <!-- Total Score Circle -->
+                    <div>
+                        <div class="text-sm uppercase tracking-widest text-zinc-400 mb-3 text-center">TOTAL SCORE</div>
+                        <div id="total-score-circle" class="score-circle"></div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 text-center text-sm text-zinc-400">
+                    <div class="font-mono">
+                        Hope: <span id="hope-die" class="text-white font-bold">-</span> | 
+                        Fear: <span id="fear-die" class="text-zinc-300 font-bold">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Form -->
+        <div class="mt-16 bg-zinc-900 border border-zinc-700 rounded-3xl p-10 shadow-2xl max-w-2xl mx-auto">
             <form id="converter-form" class="space-y-8">
                 <div class="grid grid-cols-2 gap-8">
                     <!-- AC Input -->
@@ -258,6 +366,82 @@
             document.getElementById('ac').value = ac;
             document.getElementById('hp').value = hp;
             convertStats();
+        }
+
+        function rollHopeFear() {
+            // Roll 2 D12 dice
+            const hope = Math.floor(Math.random() * 12) + 1;
+            const fear = Math.floor(Math.random() * 12) + 1;
+            
+            // Calculate total
+            const total = hope + fear;
+            
+            // Check for critical (both dice are the same)
+            const isCritical = hope === fear;
+            
+            // Determine which is higher
+            const fearHigher = fear > hope;
+            const hopeHigher = hope > fear;
+            
+            // Update the display
+            document.getElementById('hope-value').textContent = hope;
+            document.getElementById('fear-value').textContent = fear;
+            document.getElementById('hope-die').textContent = hope;
+            document.getElementById('fear-die').textContent = fear;
+            
+            // Update icon (skull for Fear higher, dove for Hope higher, lightning for critical)
+            const iconEl = document.getElementById('result-icon');
+            const criticalLabelEl = document.getElementById('critical-label');
+            
+            if (isCritical) {
+                iconEl.innerHTML = '<span style="font-size: 4rem; display: block; color: #eab308;">⚡</span>'; // Lightning bolt
+                iconEl.className = 'text-6xl flex items-center justify-center';
+                criticalLabelEl.textContent = 'CRITICAL';
+                criticalLabelEl.classList.remove('hidden');
+            } else {
+                criticalLabelEl.classList.add('hidden');
+                if (fearHigher) {
+                    iconEl.innerHTML = '<span style="font-size: 4rem; display: block;">💀</span>'; // Black skull
+                    iconEl.className = 'text-6xl flex items-center justify-center';
+                } else if (hopeHigher) {
+                    iconEl.innerHTML = '<span style="font-size: 4rem; display: block;">🕊️</span>'; // White dove
+                    iconEl.className = 'text-6xl flex items-center justify-center';
+                }
+            }
+            
+            // Update total score circle
+            const circleEl = document.getElementById('total-score-circle');
+            circleEl.textContent = total;
+            circleEl.className = 'score-circle';
+            
+            // Reset inline styles
+            circleEl.style.borderColor = '';
+            circleEl.style.background = '';
+            circleEl.style.color = '';
+            
+            if (isCritical) {
+                circleEl.classList.add('critical');
+                circleEl.classList.remove('hope-higher', 'fear-higher');
+            } else if (hopeHigher) {
+                circleEl.classList.add('hope-higher');
+                circleEl.classList.remove('fear-higher', 'critical');
+            } else if (fearHigher) {
+                circleEl.classList.add('fear-higher');
+                circleEl.classList.remove('hope-higher', 'critical');
+            }
+            
+            // Show the results
+            document.getElementById('dice-results').classList.remove('hidden');
+            
+            // Add a rolling animation effect
+            const hopeEl = document.getElementById('hope-value');
+            const fearEl = document.getElementById('fear-value');
+            hopeEl.classList.remove('dice-roll-animation');
+            fearEl.classList.remove('dice-roll-animation');
+            setTimeout(() => {
+                hopeEl.classList.add('dice-roll-animation');
+                fearEl.classList.add('dice-roll-animation');
+            }, 10);
         }
 
         // Auto-convert on page load with defaults
