@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&D → Daggerheart Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&amp;family=Playfair+Display:wght@400;700&amp;display=swap');
+        
+        body {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .title-font {
+            font-family: 'UnifrakturCook', cursive;
+        }
+
+        .stat-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5);
+        }
+
+        .dice {
+            animation: roll 4s linear infinite;
+        }
+
+        @keyframes roll {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-200 min-h-screen">
+    <!-- Header -->
+    <header class="border-b border-zinc-800 bg-black/50 backdrop-blur-lg sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-6 py-6 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-amber-500 rounded-2xl flex items-center justify-center text-3xl shadow-lg">
+                    ⚔️
+                </div>
+                <div>
+                    <h1 class="title-font text-4xl font-bold tracking-tighter text-white">Daggerheart</h1>
+                    <p class="text-xs text-emerald-400 -mt-1">FROM D&amp;D</p>
+                </div>
+            </div>
+            <!-- <div class="text-right">
+                <p class="text-sm text-zinc-400">Character Converter</p>
+                <p class="text-[10px] text-zinc-500">Level 10 • Balanced for Daggerheart</p>
+            </div> -->
+        </div>
+    </header>
+
+    <div class="max-w-5xl mx-auto px-6 py-12">
+        <!-- Hero -->
+        <!-- <div class="text-center mb-16">
+            <div class="inline-flex items-center gap-2 bg-zinc-900 border border-emerald-500/30 rounded-full px-4 py-1.5 text-sm mb-6">
+                <span class="text-emerald-400">✦</span>
+                <span class="font-medium">Seamless Conversion Tool</span>
+                <span class="text-emerald-400">✦</span>
+            </div>
+            <h2 class="text-6xl font-bold title-font tracking-tighter mb-4 leading-none">
+                Turn your D&amp;D Hero<br>into a <span class="text-emerald-400">Daggerheart Legend</span>
+            </h2>
+            <p class="text-zinc-400 max-w-md mx-auto text-lg">
+                Enter your Armor Class and Hit Points.<br>
+                Get instant Daggerheart stats.
+            </p>
+        </div> -->
+
+        <!-- Input Form -->
+        <div class="bg-zinc-900 border border-zinc-700 rounded-3xl p-10 shadow-2xl max-w-2xl mx-auto">
+            <form id="converter-form" class="space-y-8">
+                <div class="grid grid-cols-2 gap-8">
+                    <!-- AC Input -->
+                    <div>
+                        <label class="block text-emerald-400 text-sm font-medium mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            D&amp;D AC
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="number" 
+                                id="ac"
+                                value="21"
+                                min="8" 
+                                max="40"
+                                class="w-full bg-zinc-950 border border-zinc-700 focus:border-emerald-500 rounded-2xl px-6 py-5 text-4xl font-bold text-center focus:outline-none transition-all"
+                                oninput="liveConvert()">
+                            <div class="absolute right-6 top-1/2 -translate-y-1/2 text-xs text-zinc-500 font-mono">AC</div>
+                        </div>
+                    </div>
+
+                    <!-- HP Input -->
+                    <div>
+                        <label class="block text-emerald-400 text-sm font-medium mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-heart"></i>
+                            D&amp;D Hit Points
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="number" 
+                                id="hp"
+                                value="109"
+                                min="1" 
+                                max="999"
+                                class="w-full bg-zinc-950 border border-zinc-700 focus:border-emerald-500 rounded-2xl px-6 py-5 text-4xl font-bold text-center focus:outline-none transition-all"
+                                oninput="liveConvert()">
+                            <div class="absolute right-6 top-1/2 -translate-y-1/2 text-xs text-zinc-500 font-mono">HP</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Convert Button -->
+                <!-- <button 
+                    type="button"
+                    onclick="convertStats()"
+                    class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-black font-bold text-xl py-6 rounded-3xl transition-all duration-300 flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/30">
+                    <i class="fa-solid fa-wand-sparkles"></i>
+                    CONVERT TO DAGGERHEART
+                </button> -->
+            </form>
+        </div>
+
+        <!-- Results -->
+        <div id="results" class="mt-16 hidden">
+            <!-- <div class="text-center mb-8">
+                <div class="inline-flex items-center gap-3 bg-emerald-900/50 border border-emerald-500/30 rounded-full px-8 py-3">
+                    <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                    <span class="uppercase tracking-[3px] text-xs font-mono text-emerald-400">Your Daggerheart Character</span>
+                </div>
+            </div> -->
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6" id="stats-grid">
+                <!-- Stats populated by JS -->
+            </div>
+
+            <!-- Formulas -->
+            <div class="mt-16 bg-zinc-900/70 border border-zinc-700 rounded-3xl p-8">
+                <h3 class="text-emerald-400 text-sm uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <i class="fa-solid fa-book"></i>
+                    CONVERSION FORMULAS
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 text-sm">
+                    <div class="space-y-6">
+                        <div>
+                            <div class="font-mono text-emerald-400 mb-1">HP SLOTS</div>
+                            <div class="text-zinc-400">max(5, min(12, round(HP / 10)))</div>
+                        </div>
+                        <div>
+                            <div class="font-mono text-emerald-400 mb-1">EVASION</div>
+                            <div class="text-zinc-400">round((AC + 9) / 2)</div>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="font-mono text-emerald-400 mb-1">THRESHOLDS</div>
+                            <div class="text-zinc-400">
+                                Major = 2 × HP Slots + 3<br>
+                                Severe = 2 × Major
+                            </div>
+                        </div>
+                        <div>
+                            <div class="font-mono text-emerald-400 mb-1">ARMOR SLOTS</div>
+                            <div class="text-zinc-400">round(HP Slots × 0.65)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Example -->
+        <!-- <div class="mt-20 text-center">
+            <p class="text-zinc-500 text-sm mb-4">Try these examples</p>
+            <div class="flex gap-4 justify-center">
+                <button onclick="loadExample(21,109)" 
+                        class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl text-sm transition-colors">
+                    Tank (AC 21 • HP 109)
+                </button>
+                <button onclick="loadExample(15,40)" 
+                        class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl text-sm transition-colors">
+                    Rookie (AC 15 • HP 40)
+                </button>
+            </div>
+        </div> -->
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-zinc-800 py-8 text-center text-xs text-zinc-500">
+        <p>Built for the Daggerheart community • Formulas refined from playtest data</p>
+        <p class="mt-2">Not affiliated with Darrington Press • For entertainment only</p>
+    </footer>
+
+    <script>
+        // Tailwind script already loaded
+
+        function calculateStats(ac, hp) {
+            const hpSlots = Math.max(5, Math.min(12, Math.round(hp / 10)));
+            const evasion = Math.round((ac + 9) / 2);
+            const major = 2 * hpSlots + 3;
+            const severe = 2 * major;
+            const armor = Math.round(hpSlots * 0.65);
+
+            return { hpSlots, evasion, major, severe, armor };
+        }
+
+        function createStatCard(title, value, icon, subtitle, color = 'emerald') {
+            return `
+                <div class="stat-card bg-zinc-900 border border-zinc-700 rounded-3xl p-8 text-center group">
+                    <div class="text-5xl mb-4 opacity-80 group-hover:scale-110 transition-transform">${icon}</div>
+                    <div class="text-xs uppercase tracking-widest text-zinc-400 mb-1">${title}</div>
+                    <div class="text-6xl font-bold text-white mb-2">${value}</div>
+                    ${subtitle ? `<div class="text-[11px] text-zinc-500 font-mono">${subtitle}</div>` : ''}
+                </div>
+            `;
+        }
+
+        function renderResults(stats) {
+            const grid = document.getElementById('stats-grid');
+            grid.innerHTML = `
+                ${createStatCard('HP SLOTS', stats.hpSlots, '❤️', 'Hit Point Slots', 'emerald')}
+                ${createStatCard('EVASION', stats.evasion, '🛡️', 'Defense DC', 'amber')}
+                ${createStatCard('THRESHOLD', `${stats.major} / ${stats.severe}`, '⚡', 'Major / Severe', 'rose')}
+                ${createStatCard('ARMOR', stats.armor, '🛡️', 'Armor Slots', 'sky')}
+            `;
+            
+            document.getElementById('results').classList.remove('hidden');
+        }
+
+        function convertStats() {
+            const acInput = document.getElementById('ac');
+            const hpInput = document.getElementById('hp');
+            
+            const ac = parseInt(acInput.value) || 10;
+            const hp = parseInt(hpInput.value) || 20;
+            
+            const stats = calculateStats(ac, hp);
+            renderResults(stats);
+        }
+
+        // Live conversion (bonus feature)
+        function liveConvert() {
+            const ac = parseInt(document.getElementById('ac').value) || 10;
+            const hp = parseInt(document.getElementById('hp').value) || 20;
+            
+            if (ac >= 8 && hp >= 5) {
+                const stats = calculateStats(ac, hp);
+                renderResults(stats);
+            }
+        }
+
+        function loadExample(ac, hp) {
+            document.getElementById('ac').value = ac;
+            document.getElementById('hp').value = hp;
+            convertStats();
+        }
+
+        // Auto-convert on page load with defaults
+        window.onload = function() {
+            // Initial conversion
+            setTimeout(() => {
+                convertStats();
+            }, 300);
+        };
+    </script>
+</body>
+</html>
