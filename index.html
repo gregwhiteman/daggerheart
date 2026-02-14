@@ -366,16 +366,30 @@
         // Tailwind script already loaded
 
         function calculateStats(ac, hp) {
-            const hpSlots = Math.max(5, Math.min(12, Math.round(hp / 10)));
+            let hpSlots = Math.max(5, Math.min(12, Math.round(hp / 10)));
             const evasion = Math.round((ac + 9) / 2);
+            let armor = Math.round(hpSlots * 0.65);
+            let stress = Math.min(12, 6 + Math.floor(hpSlots / 2));
+            
+            // Load saved values from localStorage or use calculated defaults
+            const savedHpSlots = localStorage.getItem('daggerheart_hpSlots');
+            const savedArmor = localStorage.getItem('daggerheart_armor');
+            const savedStress = localStorage.getItem('daggerheart_stress');
+            const savedHope = localStorage.getItem('daggerheart_hope');
+            
+            if (savedHpSlots !== null) {
+                hpSlots = parseInt(savedHpSlots);
+            }
+            if (savedArmor !== null) {
+                armor = parseInt(savedArmor);
+            }
+            if (savedStress !== null) {
+                stress = parseInt(savedStress);
+            }
+            
+            const hope = savedHope !== null ? parseInt(savedHope) : 3;
             const major = 2 * hpSlots + 3;
             const severe = 2 * major;
-            const armor = Math.round(hpSlots * 0.65);
-            const stress = Math.min(12, 6 + Math.floor(hpSlots / 2));
-            
-            // Load hope from localStorage or use default
-            const savedHope = localStorage.getItem('daggerheart_hope');
-            const hope = savedHope !== null ? parseInt(savedHope) : 3;
 
             return { hope, hpSlots, evasion, major, severe, armor, stress };
         }
@@ -391,31 +405,42 @@
             `;
         }
 
-        function createHopeCard(hope) {
-            const isDisabled = hope <= 0;
-            const disabledClass = isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-zinc-700 active:scale-95';
-            const disabledAttr = isDisabled ? 'disabled' : '';
+        function createInteractiveStatCard(id, value, icon, title, subtitle, minValue = 0, maxValue = null) {
+            const isMinDisabled = value <= minValue;
+            const isMaxDisabled = maxValue !== null && value >= maxValue;
+            const minDisabledClass = isMinDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-zinc-700 active:scale-95';
+            const maxDisabledClass = isMaxDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-zinc-700 active:scale-95';
+            const minDisabledAttr = isMinDisabled ? 'disabled' : '';
+            const maxDisabledAttr = isMaxDisabled ? 'disabled' : '';
             
             return `
                 <div class="stat-card bg-zinc-900 border border-zinc-700 rounded-3xl p-4 sm:p-8 text-center group">
-                    <div class="text-3xl sm:text-5xl mb-2 sm:mb-4 opacity-80 group-hover:scale-110 transition-transform">🕊️</div>
-                    <div class="flex items-center justify-center gap-3 sm:gap-4 mb-2">
+                    <div class="text-3xl sm:text-5xl mb-2 sm:mb-4 opacity-80 group-hover:scale-110 transition-transform">${icon}</div>
+                    <div class="text-[10px] sm:text-xs uppercase tracking-widest text-zinc-400 mb-1">${title}</div>
+                    <div class="flex items-center justify-center gap-3 sm:gap-4 mb-1 sm:mb-2">
                         <button 
-                            id="hope-decrease-btn"
-                            onclick="adjustHope(-1)"
-                            ${disabledAttr}
-                            class="bg-zinc-800 ${disabledClass} border border-zinc-600 text-white font-bold text-2xl sm:text-3xl w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all touch-manipulation">
+                            id="${id}-decrease-btn"
+                            onclick="adjustStat('${id}', -1, ${minValue}, ${maxValue !== null ? maxValue : 'null'})"
+                            ${minDisabledAttr}
+                            class="bg-zinc-800 ${minDisabledClass} border border-zinc-600 text-white font-bold text-2xl sm:text-3xl w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all touch-manipulation">
                             −
                         </button>
-                        <div id="hope-value-display" class="text-4xl sm:text-6xl font-bold text-white min-w-[60px] sm:min-w-[80px] text-center">${hope}</div>
+                        <div id="${id}-value-display" class="text-4xl sm:text-6xl font-bold text-white min-w-[60px] sm:min-w-[80px] text-center">${value}</div>
                         <button 
-                            onclick="adjustHope(1)"
-                            class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-white font-bold text-2xl sm:text-3xl w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all touch-manipulation">
+                            id="${id}-increase-btn"
+                            onclick="adjustStat('${id}', 1, ${minValue}, ${maxValue !== null ? maxValue : 'null'})"
+                            ${maxDisabledAttr}
+                            class="bg-zinc-800 ${maxDisabledClass} border border-zinc-600 text-white font-bold text-2xl sm:text-3xl w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all touch-manipulation">
                             +
                         </button>
                     </div>
+                    ${subtitle ? `<div class="text-[10px] sm:text-[11px] text-zinc-500 font-mono">${subtitle}</div>` : ''}
                 </div>
             `;
+        }
+
+        function createHopeCard(hope) {
+            return createInteractiveStatCard('hope', hope, '🕊️', '', '', 0, null);
         }
 
         function renderResults(stats) {
@@ -423,38 +448,42 @@
             grid.innerHTML = `
                 ${createHopeCard(stats.hope)}
                 ${createStatCard('THRESHOLD', `${stats.major} / ${stats.severe}`, '⚡', 'Major / Severe', 'rose')}
-                ${createStatCard('HP SLOTS', stats.hpSlots, '❤️', 'Hit Point Slots', 'emerald')}
+                ${createInteractiveStatCard('hpSlots', stats.hpSlots, '❤️', 'HP SLOTS', 'Hit Point Slots', 1, 20)}
                 ${createStatCard('EVASION', stats.evasion, '🛡️', 'Defense DC', 'amber')}
-                ${createStatCard('ARMOR', stats.armor, '🛡️', 'Armor Slots', 'sky')}
-                ${createStatCard('STRESS', stats.stress, '💥', 'Stress', 'red')}
+                ${createInteractiveStatCard('armor', stats.armor, '🛡️', 'ARMOR', 'Armor Slots', 0, null)}
+                ${createInteractiveStatCard('stress', stats.stress, '💥', 'STRESS', 'Stress', 0, 12)}
             `;
             
             document.getElementById('results').classList.remove('hidden');
         }
 
-        function adjustHope(change) {
+        function adjustStat(statId, change, minValue = 0, maxValue = null) {
             // Ensure change is only -1 or 1
             if (change !== -1 && change !== 1) {
                 change = change > 0 ? 1 : -1;
             }
             
-            const hopeDisplay = document.getElementById('hope-value-display');
-            const currentHopeText = hopeDisplay.textContent.trim();
-            // Use nullish coalescing to properly handle 0 (0 is falsy but valid)
-            const parsed = parseInt(currentHopeText);
-            const currentHope = isNaN(parsed) ? 3 : parsed;
-            const newHope = Math.max(0, currentHope + change); // Prevent negative values
+            const displayEl = document.getElementById(`${statId}-value-display`);
+            if (!displayEl) return;
             
-            // Don't allow going below 0
-            if (newHope < 0) return;
+            const currentText = displayEl.textContent.trim();
+            const parsed = parseInt(currentText);
+            const currentValue = isNaN(parsed) ? 0 : parsed;
+            let newValue = currentValue + change;
+            
+            // Apply min/max constraints
+            if (newValue < minValue) return;
+            if (maxValue !== null && newValue > maxValue) return;
             
             // Update display
-            document.getElementById('hope-value-display').textContent = newHope;
+            displayEl.textContent = newValue;
             
-            // Update button state
-            const decreaseBtn = document.getElementById('hope-decrease-btn');
+            // Update button states
+            const decreaseBtn = document.getElementById(`${statId}-decrease-btn`);
+            const increaseBtn = document.getElementById(`${statId}-increase-btn`);
+            
             if (decreaseBtn) {
-                if (newHope <= 0) {
+                if (newValue <= minValue) {
                     decreaseBtn.disabled = true;
                     decreaseBtn.classList.add('opacity-50', 'cursor-not-allowed');
                     decreaseBtn.classList.remove('hover:bg-zinc-700', 'active:scale-95');
@@ -465,8 +494,24 @@
                 }
             }
             
+            if (increaseBtn && maxValue !== null) {
+                if (newValue >= maxValue) {
+                    increaseBtn.disabled = true;
+                    increaseBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    increaseBtn.classList.remove('hover:bg-zinc-700', 'active:scale-95');
+                } else {
+                    increaseBtn.disabled = false;
+                    increaseBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    increaseBtn.classList.add('hover:bg-zinc-700', 'active:scale-95');
+                }
+            }
+            
             // Save to localStorage
-            localStorage.setItem('daggerheart_hope', newHope.toString());
+            localStorage.setItem(`daggerheart_${statId}`, newValue.toString());
+        }
+
+        function adjustHope(change) {
+            adjustStat('hope', change, 0, null);
         }
 
         function convertStats() {
@@ -536,9 +581,39 @@
         }
 
         // Live conversion (bonus feature)
+        function resetHope() {
+            // Reset hope to default value of 3
+            localStorage.setItem('daggerheart_hope', '3');
+            
+            // Update display if it exists
+            const hopeDisplay = document.getElementById('hope-value-display');
+            if (hopeDisplay) {
+                hopeDisplay.textContent = '3';
+                
+                // Update button state
+                const decreaseBtn = document.getElementById('hope-decrease-btn');
+                if (decreaseBtn) {
+                    decreaseBtn.disabled = false;
+                    decreaseBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    decreaseBtn.classList.add('hover:bg-zinc-700', 'active:scale-95');
+                }
+            }
+        }
+
+        function resetStats() {
+            // Remove saved stat overrides when AC or HP changes
+            localStorage.removeItem('daggerheart_hpSlots');
+            localStorage.removeItem('daggerheart_armor');
+            localStorage.removeItem('daggerheart_stress');
+        }
+
         function liveConvert() {
             const ac = parseInt(document.getElementById('ac').value) || 10;
             const hp = parseInt(document.getElementById('hp').value) || 20;
+            
+            // Reset hope and other stats when AC or HP changes
+            resetHope();
+            resetStats();
             
             if (ac >= 8 && hp >= 5) {
                 const stats = calculateStats(ac, hp);
