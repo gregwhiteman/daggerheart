@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>D&D → Daggerheart Converter</title>
+    <title>Daggerheart</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -123,28 +123,19 @@
     <header class="border-b border-zinc-800 bg-black/50 backdrop-blur-lg sticky top-0 z-50">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
             <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-                <div class="flex items-center gap-3 sm:gap-4">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-500 to-amber-500 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl shadow-lg">
-                        ⚔️
-                    </div>
-                    <div>
-                        <h1 class="title-font text-2xl sm:text-4xl font-bold tracking-tighter text-white">Daggerheart</h1>
-                        <p class="text-[10px] sm:text-xs text-emerald-400 -mt-1">FROM D&amp;D</p>
-                    </div>
-                </div>
                 <div class="w-full sm:flex-1 sm:flex sm:justify-center px-2 sm:px-4">
                     <input 
                         type="text" 
                         id="character-name"
                         placeholder="Character Name"
-                        class="w-full max-w-md bg-zinc-950/50 border border-zinc-700 focus:border-emerald-500 rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 text-lg sm:text-2xl font-bold title-font text-center text-white placeholder-zinc-500 focus:outline-none transition-all"
+                        class="w-full max-w-md bg-zinc-950/50 border border-zinc-700 focus:border-emerald-500 rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 text-4xl sm:text-5xl font-bold title-font text-center text-white placeholder-zinc-500 focus:outline-none transition-all"
                         oninput="saveToLocalStorage()">
                 </div>
             </div>
         </div>
     </header>
 
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-0 sm:py-0">
         <!-- Hero -->
         <!-- <div class="text-center mb-16">
             <div class="inline-flex items-center gap-2 bg-zinc-900 border border-emerald-500/30 rounded-full px-4 py-1.5 text-sm mb-6">
@@ -227,46 +218,46 @@
             </div>
         </div> -->
 
+        <!-- Reset Button -->
+        <div class="mt-8 sm:mt-16 mb-6 sm:mb-8 max-w-2xl mx-auto px-4 sm:px-6">
+            <button 
+                onclick="resetAllStats()"
+                class="w-full bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-zinc-200 font-medium text-sm sm:text-base py-3 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 touch-manipulation">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>Reset All Stats</span>
+            </button>
+        </div>
+
         <!-- Hope & Fear Dice Roller -->
         <div class="mt-8 sm:mt-16 bg-zinc-900 border border-zinc-700 rounded-3xl p-6 sm:p-10 shadow-2xl max-w-2xl mx-auto">
-            <h2 class="text-xl sm:text-2xl font-bold title-font mb-4 sm:mb-6 text-center text-white">
-                Hope & Fear Roll
-            </h2>
-            <div class="text-center mb-6 sm:mb-8">
-                <button 
-                    onclick="rollHopeFear()"
-                    class="bg-gradient-to-r from-white to-zinc-900 hover:from-zinc-100 hover:to-black active:scale-95 text-white font-bold text-base sm:text-xl py-4 sm:py-6 px-8 sm:px-12 rounded-3xl transition-all duration-300 flex items-center justify-center gap-3 shadow-xl shadow-white/20 mx-auto w-full sm:w-auto min-h-[44px] touch-manipulation">
-                    <i class="fa-solid fa-dice"></i>
-                    <span class="whitespace-nowrap">ROLL HOPE & FEAR</span>
-                </button>
-            </div>
             <div id="dice-results" class="hidden">
-                <div class="grid grid-cols-2 gap-4 sm:gap-6 mt-6 sm:mt-8">
+                <!-- Icon and Total Score Circle on same line -->
+                <div class="flex items-center justify-center gap-4 sm:gap-6 mb-6 sm:mb-8">
+                    <!-- Icon (Skull or Dove or Lightning) -->
+                    <div id="result-icon" class="text-4xl sm:text-6xl flex items-center justify-center"></div>
+                    
+                    <!-- Total Score Circle -->
+                    <div>
+                        <div id="total-score-circle" class="score-circle"></div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 sm:gap-6">
                     <div class="bg-zinc-950 border-2 border-white rounded-3xl p-4 sm:p-8 text-center">
                         <div class="text-xs sm:text-sm uppercase tracking-widest text-white mb-2 sm:mb-3">HOPE</div>
-                        <div id="hope-value" class="text-4xl sm:text-6xl font-bold text-white mb-1 sm:mb-2">-</div>
+                        <div id="hope-value" class="text-5xl sm:text-7xl font-bold text-white mb-1 sm:mb-2">-</div>
                         <div class="text-[10px] sm:text-xs text-zinc-500 font-mono">D12</div>
                     </div>
                     <div class="bg-black border-2 border-zinc-900 rounded-3xl p-4 sm:p-8 text-center">
                         <div class="text-xs sm:text-sm uppercase tracking-widest text-zinc-300 mb-2 sm:mb-3">FEAR</div>
-                        <div id="fear-value" class="text-4xl sm:text-6xl font-bold text-zinc-200 mb-1 sm:mb-2">-</div>
+                        <div id="fear-value" class="text-5xl sm:text-7xl font-bold text-zinc-200 mb-1 sm:mb-2">-</div>
                         <div class="text-[10px] sm:text-xs text-zinc-500 font-mono">D12</div>
                     </div>
                 </div>
                 
-                <!-- Icon Indicator and Total Score -->
+                <!-- Critical Label -->
                 <div class="mt-6 sm:mt-8 flex flex-col items-center gap-4 sm:gap-6">
-                    <!-- Icon (Skull or Dove or Lightning) -->
-                    <div id="result-icon" class="text-4xl sm:text-6xl flex items-center justify-center"></div>
-                    
-                    <!-- Critical Label -->
                     <div id="critical-label" class="critical-label hidden text-base sm:text-xl"></div>
-                    
-                    <!-- Total Score Circle -->
-                    <div>
-                        <div class="text-xs sm:text-sm uppercase tracking-widest text-zinc-400 mb-2 sm:mb-3 text-center">TOTAL SCORE</div>
-                        <div id="total-score-circle" class="score-circle"></div>
-                    </div>
                 </div>
                 
                 <div class="mt-4 sm:mt-6 text-center text-xs sm:text-sm text-zinc-400">
@@ -275,6 +266,14 @@
                         Fear: <span id="fear-die" class="text-zinc-300 font-bold">-</span>
                     </div>
                 </div>
+            </div>
+            <div class="text-center mt-6 sm:mt-8">
+                <button 
+                    onclick="rollHopeFear()"
+                    class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-zinc-200 font-medium text-sm sm:text-base py-3 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 touch-manipulation mx-auto w-full sm:w-auto">
+                    <i class="fa-solid fa-dice"></i>
+                    <span>Roll Dice</span>
+                </button>
             </div>
         </div>
 
@@ -366,10 +365,10 @@
         // Tailwind script already loaded
 
         function calculateStats(ac, hp) {
-            let hpSlots = Math.max(5, Math.min(12, Math.round(hp / 10)));
+            const calculatedHpSlots = Math.max(5, Math.min(12, Math.round(hp / 10)));
             const evasion = Math.round((ac + 9) / 2);
-            let armor = Math.round(hpSlots * 0.65);
-            let stress = Math.min(12, 6 + Math.floor(hpSlots / 2));
+            const calculatedArmor = Math.round(calculatedHpSlots * 0.65);
+            let stress = Math.min(12, 6 + Math.floor(calculatedHpSlots / 2));
             
             // Load saved values from localStorage or use calculated defaults
             const savedHpSlots = localStorage.getItem('daggerheart_hpSlots');
@@ -377,11 +376,18 @@
             const savedStress = localStorage.getItem('daggerheart_stress');
             const savedHope = localStorage.getItem('daggerheart_hope');
             
+            let hpSlots = calculatedHpSlots;
             if (savedHpSlots !== null) {
                 hpSlots = parseInt(savedHpSlots);
+                // Ensure hpSlots doesn't exceed calculated max
+                hpSlots = Math.min(hpSlots, calculatedHpSlots);
             }
+            // Armor defaults to 0, not the calculated value
+            let armor = 0;
             if (savedArmor !== null) {
                 armor = parseInt(savedArmor);
+                // Ensure armor doesn't exceed calculated max
+                armor = Math.min(armor, calculatedArmor);
             }
             if (savedStress !== null) {
                 stress = parseInt(savedStress);
@@ -390,14 +396,27 @@
             const hope = savedHope !== null ? parseInt(savedHope) : 3;
             const major = 2 * hpSlots + 3;
             const severe = 2 * major;
+            const calculatedStress = Math.min(12, 6 + Math.floor(calculatedHpSlots / 2));
+            
+            // When stress exceeds calculated value, it depletes HP
+            // HP = max(0, calculatedHpSlots - (stress - calculatedStress)) when stress > calculatedStress
+            if (stress > calculatedStress) {
+                const stressExcess = stress - calculatedStress;
+                const stressDepletedHp = Math.max(0, calculatedHpSlots - stressExcess);
+                // If HP is above what stress allows, reduce it
+                if (hpSlots > stressDepletedHp) {
+                    hpSlots = stressDepletedHp;
+                }
+            }
 
-            return { hope, hpSlots, evasion, major, severe, armor, stress };
+            return { hope, hpSlots, calculatedHpSlots, evasion, major, severe, armor, calculatedArmor, stress, calculatedStress };
         }
 
-        function createStatCard(title, value, icon, subtitle, color = 'emerald') {
+        function createStatCard(title, value, icon, subtitle, color = 'emerald', iconId = null) {
+            const iconElementId = iconId || `stat-icon-${title.toLowerCase().replace(/\s+/g, '-')}`;
             return `
                 <div class="stat-card bg-zinc-900 border border-zinc-700 rounded-3xl p-4 sm:p-8 text-center group">
-                    <div class="text-3xl sm:text-5xl mb-2 sm:mb-4 opacity-80 group-hover:scale-110 transition-transform">${icon}</div>
+                    <div id="${iconElementId}" class="text-3xl sm:text-5xl mb-2 sm:mb-4 opacity-80 group-hover:scale-110 transition-transform" data-original-icon="${icon}">${icon}</div>
                     <div class="text-[10px] sm:text-xs uppercase tracking-widest text-zinc-400 mb-1">${title}</div>
                     <div class="text-4xl sm:text-6xl font-bold text-white mb-1 sm:mb-2">${value}</div>
                     ${subtitle ? `<div class="text-[10px] sm:text-[11px] text-zinc-500 font-mono">${subtitle}</div>` : ''}
@@ -405,17 +424,32 @@
             `;
         }
 
-        function createInteractiveStatCard(id, value, icon, title, subtitle, minValue = 0, maxValue = null) {
-            const isMinDisabled = value <= minValue;
+        function createInteractiveStatCard(id, value, icon, title, subtitle, minValue = 0, maxValue = null, calculatedValue = null) {
+            // Special handling for hpSlots: show skull when value is 0
+            let displayIcon = icon;
+            if (id === 'hpSlots' && value === 0) {
+                displayIcon = '💀';
+            }
+            
+            // For stress, don't disable decrease button (can go negative)
+            const isMinDisabled = (id === 'stress' && minValue === -Infinity) ? false : (value <= minValue);
             const isMaxDisabled = maxValue !== null && value >= maxValue;
             const minDisabledClass = isMinDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-zinc-700 active:scale-95';
             const maxDisabledClass = isMaxDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-zinc-700 active:scale-95';
             const minDisabledAttr = isMinDisabled ? 'disabled' : '';
             const maxDisabledAttr = isMaxDisabled ? 'disabled' : '';
             
+            // For HP Slots, Stress, and Armor, show calculated value next to icon
+            const iconDisplay = (id === 'hpSlots' || id === 'stress' || id === 'armor') && calculatedValue !== null
+                ? `<div class="flex items-center justify-center gap-2 mb-2 sm:mb-4">
+                    <div id="${id}-icon" class="text-3xl sm:text-5xl opacity-80 group-hover:scale-110 transition-transform" data-original-icon="${icon}">${displayIcon}</div>
+                    <div class="text-lg sm:text-xl text-zinc-400 font-mono">(${calculatedValue})</div>
+                   </div>`
+                : `<div id="${id}-icon" class="text-3xl sm:text-5xl mb-2 sm:mb-4 opacity-80 group-hover:scale-110 transition-transform" data-original-icon="${icon}">${displayIcon}</div>`;
+            
             return `
                 <div class="stat-card bg-zinc-900 border border-zinc-700 rounded-3xl p-4 sm:p-8 text-center group">
-                    <div class="text-3xl sm:text-5xl mb-2 sm:mb-4 opacity-80 group-hover:scale-110 transition-transform">${icon}</div>
+                    ${iconDisplay}
                     <div class="text-[10px] sm:text-xs uppercase tracking-widest text-zinc-400 mb-1">${title}</div>
                     <div class="flex items-center justify-center gap-3 sm:gap-4 mb-1 sm:mb-2">
                         <button 
@@ -443,16 +477,97 @@
             return createInteractiveStatCard('hope', hope, '🕊️', '', '', 0, null);
         }
 
+        function updateAllIconsForHpSlots(hpSlotsValue) {
+            // Get all icon elements
+            const icons = [
+                { id: 'hope-icon', original: '🕊️' },
+                { id: 'stat-icon-threshold', original: '⚡' },
+                { id: 'hpSlots-icon', original: '❤️' },
+                { id: 'stat-icon-evasion', original: '🛡️' },
+                { id: 'armor-icon', original: '🛡️' },
+                { id: 'stress-icon', original: '💥' }
+            ];
+            
+            icons.forEach(iconInfo => {
+                const iconEl = document.getElementById(iconInfo.id);
+                if (iconEl) {
+                    const originalIcon = iconEl.getAttribute('data-original-icon') || iconInfo.original;
+                    if (hpSlotsValue === 0) {
+                        iconEl.textContent = '💀';
+                    } else {
+                        iconEl.textContent = originalIcon;
+                    }
+                }
+            });
+        }
+
         function renderResults(stats) {
             const grid = document.getElementById('stats-grid');
-            grid.innerHTML = `
-                ${createHopeCard(stats.hope)}
-                ${createStatCard('THRESHOLD', `${stats.major} / ${stats.severe}`, '⚡', 'Major / Severe', 'rose')}
-                ${createInteractiveStatCard('hpSlots', stats.hpSlots, '❤️', 'HP SLOTS', 'Hit Point Slots', 1, 20)}
-                ${createStatCard('EVASION', stats.evasion, '🛡️', 'Defense DC', 'amber')}
-                ${createInteractiveStatCard('armor', stats.armor, '🛡️', 'ARMOR', 'Armor Slots', 0, null)}
-                ${createInteractiveStatCard('stress', stats.stress, '💥', 'STRESS', 'Stress', 0, 12)}
+            
+            // Add button section above the grid
+            const resultsContainer = document.getElementById('results');
+            let buttonSection = document.getElementById('threshold-buttons-section');
+            if (!buttonSection) {
+                buttonSection = document.createElement('div');
+                buttonSection.id = 'threshold-buttons-section';
+                buttonSection.className = 'mb-6 sm:mb-8 flex items-center justify-center gap-3 sm:gap-6 flex-wrap';
+                resultsContainer.insertBefore(buttonSection, grid);
+            }
+            buttonSection.innerHTML = `
+                <button 
+                    onclick="handleThresholdButton('min')"
+                    class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-white font-bold text-base sm:text-lg py-3 sm:py-4 px-6 sm:px-8 rounded-2xl transition-all touch-manipulation">
+                    Min
+                </button>
+                <div class="text-2xl sm:text-3xl font-bold text-white min-w-[40px] sm:min-w-[60px] text-center" id="threshold-major-value">${stats.major}</div>
+                <button 
+                    onclick="handleThresholdButton('maj')"
+                    class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-white font-bold text-base sm:text-lg py-3 sm:py-4 px-6 sm:px-8 rounded-2xl transition-all touch-manipulation">
+                    Maj
+                </button>
+                <div class="text-2xl sm:text-3xl font-bold text-white min-w-[40px] sm:min-w-[60px] text-center" id="threshold-severe-value">${stats.severe}</div>
+                <button 
+                    onclick="handleThresholdButton('sev')"
+                    class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-white font-bold text-base sm:text-lg py-3 sm:py-4 px-6 sm:px-8 rounded-2xl transition-all touch-manipulation">
+                    Sev
+                </button>
             `;
+            
+            grid.innerHTML = `
+                ${createStatCard('EVASION', stats.evasion, '🛡️', 'Defense DC', 'amber', 'stat-icon-evasion')}
+                ${createStatCard('THRESHOLD', `${stats.major} / ${stats.severe}`, '⚡', 'Major / Severe', 'rose', 'stat-icon-threshold')}
+                ${createHopeCard(stats.hope)}
+                ${createInteractiveStatCard('hpSlots', stats.hpSlots, '❤️', 'HP SLOTS', 'Hit Point Slots', 0, stats.calculatedHpSlots, stats.calculatedHpSlots)}
+                ${createInteractiveStatCard('armor', stats.armor, '🛡️', 'ARMOR', 'Armor Slots', 0, stats.calculatedArmor, stats.calculatedArmor)}
+                ${createInteractiveStatCard('stress', stats.stress, '💥', 'STRESS', 'Stress', 0, null, stats.calculatedStress)}
+            `;
+            
+            // Store calculated max values for adjustStat to access
+            const armorCard = document.getElementById('armor-increase-btn');
+            if (armorCard) {
+                armorCard.setAttribute('data-max', stats.calculatedArmor);
+            }
+            const hpSlotsCard = document.getElementById('hpSlots-increase-btn');
+            if (hpSlotsCard) {
+                hpSlotsCard.setAttribute('data-max', stats.calculatedHpSlots);
+            }
+            
+            // Update all icons based on current HP Slots value
+            updateAllIconsForHpSlots(stats.hpSlots);
+            
+            // Update stress increase button state based on HP
+            const stressIncreaseBtn = document.getElementById('stress-increase-btn');
+            if (stressIncreaseBtn) {
+                if (stats.hpSlots === 0) {
+                    stressIncreaseBtn.disabled = true;
+                    stressIncreaseBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    stressIncreaseBtn.classList.remove('hover:bg-zinc-700', 'active:scale-95');
+                } else {
+                    stressIncreaseBtn.disabled = false;
+                    stressIncreaseBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    stressIncreaseBtn.classList.add('hover:bg-zinc-700', 'active:scale-95');
+                }
+            }
             
             document.getElementById('results').classList.remove('hidden');
         }
@@ -466,6 +581,14 @@
             const displayEl = document.getElementById(`${statId}-value-display`);
             if (!displayEl) return;
             
+            // For armor and hpSlots, get max from data attribute if available (in case it was recalculated)
+            if ((statId === 'armor' || statId === 'hpSlots') && maxValue === null) {
+                const increaseBtn = document.getElementById(`${statId}-increase-btn`);
+                if (increaseBtn && increaseBtn.getAttribute('data-max')) {
+                    maxValue = parseInt(increaseBtn.getAttribute('data-max'));
+                }
+            }
+            
             const currentText = displayEl.textContent.trim();
             const parsed = parseInt(currentText);
             const currentValue = isNaN(parsed) ? 0 : parsed;
@@ -473,17 +596,170 @@
             
             // Apply min/max constraints
             if (newValue < minValue) return;
+            
+            // For HP Slots, check if stress exceeds calculated value and would limit HP
+            if (statId === 'hpSlots') {
+                const stressDisplay = document.getElementById('stress-value-display');
+                if (stressDisplay) {
+                    const stressValue = parseInt(stressDisplay.textContent) || 0;
+                    const hpSlotsIncreaseBtn = document.getElementById('hpSlots-increase-btn');
+                    if (hpSlotsIncreaseBtn) {
+                        const calculatedHpSlots = parseInt(hpSlotsIncreaseBtn.getAttribute('data-max')) || 0;
+                        const calculatedStress = Math.min(12, 6 + Math.floor(calculatedHpSlots / 2));
+                        
+                        if (stressValue > calculatedStress) {
+                            const stressExcess = stressValue - calculatedStress;
+                            const maxHpFromStress = Math.max(0, calculatedHpSlots - stressExcess);
+                            if (newValue > maxHpFromStress) {
+                                return; // Cannot increase HP above stress-depleted value
+                            }
+                            // Update maxValue to the stress-depleted value
+                            maxValue = maxHpFromStress;
+                        }
+                    }
+                }
+            }
+            
+            // For Stress: prevent increasing if HP is already 0
+            if (statId === 'stress' && change > 0) {
+                const hpSlotsDisplay = document.getElementById('hpSlots-value-display');
+                if (hpSlotsDisplay) {
+                    const currentHp = parseInt(hpSlotsDisplay.textContent) || 0;
+                    if (currentHp === 0) {
+                        return; // Cannot increase stress when HP is 0
+                    }
+                }
+            }
+            
             if (maxValue !== null && newValue > maxValue) return;
+            
+            // Special handling for stress: when exceeding calculated value, deplete HP
+            if (statId === 'stress') {
+                const hpSlotsDisplay = document.getElementById('hpSlots-value-display');
+                const hpSlotsIncreaseBtn = document.getElementById('hpSlots-increase-btn');
+                if (hpSlotsDisplay && hpSlotsIncreaseBtn) {
+                    const calculatedHpSlots = parseInt(hpSlotsIncreaseBtn.getAttribute('data-max')) || 0;
+                    const calculatedStress = Math.min(12, 6 + Math.floor(calculatedHpSlots / 2));
+                    const currentHp = parseInt(hpSlotsDisplay.textContent) || 0;
+                    
+                    if (newValue > calculatedStress) {
+                        // Stress exceeds calculated: deplete HP
+                        const stressExcess = newValue - calculatedStress;
+                        const stressDepletedHp = Math.max(0, calculatedHpSlots - stressExcess);
+                        
+                        // If current HP is above what stress allows, reduce it
+                        if (currentHp > stressDepletedHp) {
+                            hpSlotsDisplay.textContent = stressDepletedHp;
+                            localStorage.setItem('daggerheart_hpSlots', stressDepletedHp.toString());
+                            
+                            // Update HP icon and all icons if HP reaches 0
+                            updateAllIconsForHpSlots(stressDepletedHp);
+                            
+                            // Update HP button states
+                            const hpSlotsDecreaseBtn = document.getElementById('hpSlots-decrease-btn');
+                            if (hpSlotsDecreaseBtn) {
+                                if (stressDepletedHp <= 0) {
+                                    hpSlotsDecreaseBtn.disabled = true;
+                                    hpSlotsDecreaseBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                                    hpSlotsDecreaseBtn.classList.remove('hover:bg-zinc-700', 'active:scale-95');
+                                } else {
+                                    hpSlotsDecreaseBtn.disabled = false;
+                                    hpSlotsDecreaseBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                                    hpSlotsDecreaseBtn.classList.add('hover:bg-zinc-700', 'active:scale-95');
+                                }
+                            }
+                            if (stressDepletedHp >= calculatedHpSlots) {
+                                hpSlotsIncreaseBtn.disabled = true;
+                                hpSlotsIncreaseBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                                hpSlotsIncreaseBtn.classList.remove('hover:bg-zinc-700', 'active:scale-95');
+                            } else {
+                                hpSlotsIncreaseBtn.disabled = false;
+                                hpSlotsIncreaseBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                                hpSlotsIncreaseBtn.classList.add('hover:bg-zinc-700', 'active:scale-95');
+                            }
+                        }
+                    } else {
+                        // Stress is at or below calculated: HP can go back up to calculated value
+                        // Update HP button states to allow increase if HP is below calculated
+                        if (currentHp >= calculatedHpSlots) {
+                            hpSlotsIncreaseBtn.disabled = true;
+                            hpSlotsIncreaseBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                            hpSlotsIncreaseBtn.classList.remove('hover:bg-zinc-700', 'active:scale-95');
+                        } else {
+                            hpSlotsIncreaseBtn.disabled = false;
+                            hpSlotsIncreaseBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                            hpSlotsIncreaseBtn.classList.add('hover:bg-zinc-700', 'active:scale-95');
+                        }
+                    }
+                }
+            }
             
             // Update display
             displayEl.textContent = newValue;
+            
+            // Special handling for hpSlots: update all icons when value changes to/from 0
+            if (statId === 'hpSlots') {
+                updateAllIconsForHpSlots(newValue);
+                
+                // Update stress increase button state when HP changes
+                const stressIncreaseBtn = document.getElementById('stress-increase-btn');
+                if (stressIncreaseBtn) {
+                    if (newValue === 0) {
+                        stressIncreaseBtn.disabled = true;
+                        stressIncreaseBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                        stressIncreaseBtn.classList.remove('hover:bg-zinc-700', 'active:scale-95');
+                    } else {
+                        // Re-enable if HP is above 0 and stress is not at max
+                        const stressDisplay = document.getElementById('stress-value-display');
+                        if (stressDisplay) {
+                            const currentStress = parseInt(stressDisplay.textContent) || 0;
+                            // Check if there's a max value constraint
+                            const stressCard = document.getElementById('stress-increase-btn');
+                            // For now, just enable it if HP > 0 (stress has no max)
+                            stressIncreaseBtn.disabled = false;
+                            stressIncreaseBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                            stressIncreaseBtn.classList.add('hover:bg-zinc-700', 'active:scale-95');
+                        }
+                    }
+                }
+            }
             
             // Update button states
             const decreaseBtn = document.getElementById(`${statId}-decrease-btn`);
             const increaseBtn = document.getElementById(`${statId}-increase-btn`);
             
             if (decreaseBtn) {
-                if (newValue <= minValue) {
+                // For stress, check if HP is 0 to determine if decrease should be disabled
+                if (statId === 'stress' && minValue === -Infinity) {
+                    const hpSlotsDisplay = document.getElementById('hpSlots-value-display');
+                    const hpSlotsIncreaseBtn = document.getElementById('hpSlots-increase-btn');
+                    if (hpSlotsDisplay && hpSlotsIncreaseBtn) {
+                        const currentHp = parseInt(hpSlotsDisplay.textContent) || 0;
+                        const calculatedHpSlots = parseInt(hpSlotsIncreaseBtn.getAttribute('data-max')) || 0;
+                        
+                        // If HP is 0, check if stress can go more negative
+                        if (currentHp === 0) {
+                            const maxNegativeStress = -calculatedHpSlots;
+                            if (newValue <= maxNegativeStress) {
+                                decreaseBtn.disabled = true;
+                                decreaseBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                                decreaseBtn.classList.remove('hover:bg-zinc-700', 'active:scale-95');
+                            } else {
+                                decreaseBtn.disabled = false;
+                                decreaseBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                                decreaseBtn.classList.add('hover:bg-zinc-700', 'active:scale-95');
+                            }
+                        } else {
+                            decreaseBtn.disabled = false;
+                            decreaseBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                            decreaseBtn.classList.add('hover:bg-zinc-700', 'active:scale-95');
+                        }
+                    } else {
+                        decreaseBtn.disabled = false;
+                        decreaseBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        decreaseBtn.classList.add('hover:bg-zinc-700', 'active:scale-95');
+                    }
+                } else if (newValue <= minValue) {
                     decreaseBtn.disabled = true;
                     decreaseBtn.classList.add('opacity-50', 'cursor-not-allowed');
                     decreaseBtn.classList.remove('hover:bg-zinc-700', 'active:scale-95');
@@ -494,7 +770,48 @@
                 }
             }
             
-            if (increaseBtn && maxValue !== null) {
+            // For HP Slots, check if stress exceeds calculated value and limits the max
+            if (statId === 'hpSlots' && increaseBtn) {
+                const stressDisplay = document.getElementById('stress-value-display');
+                if (stressDisplay) {
+                    const stressValue = parseInt(stressDisplay.textContent) || 0;
+                    const calculatedHpSlots = parseInt(increaseBtn.getAttribute('data-max')) || 0;
+                    const calculatedStress = Math.min(12, 6 + Math.floor(calculatedHpSlots / 2));
+                    
+                    if (stressValue > calculatedStress) {
+                        const stressExcess = stressValue - calculatedStress;
+                        const maxHpFromStress = Math.max(0, calculatedHpSlots - stressExcess);
+                        if (newValue >= maxHpFromStress) {
+                            increaseBtn.disabled = true;
+                            increaseBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                            increaseBtn.classList.remove('hover:bg-zinc-700', 'active:scale-95');
+                        } else {
+                            increaseBtn.disabled = false;
+                            increaseBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                            increaseBtn.classList.add('hover:bg-zinc-700', 'active:scale-95');
+                        }
+                    } else {
+                        // No stress limit, use normal maxValue
+                        if (maxValue !== null && newValue >= maxValue) {
+                            increaseBtn.disabled = true;
+                            increaseBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                            increaseBtn.classList.remove('hover:bg-zinc-700', 'active:scale-95');
+                        } else {
+                            increaseBtn.disabled = false;
+                            increaseBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                            increaseBtn.classList.add('hover:bg-zinc-700', 'active:scale-95');
+                        }
+                    }
+                } else if (maxValue !== null && newValue >= maxValue) {
+                    increaseBtn.disabled = true;
+                    increaseBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    increaseBtn.classList.remove('hover:bg-zinc-700', 'active:scale-95');
+                } else {
+                    increaseBtn.disabled = false;
+                    increaseBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    increaseBtn.classList.add('hover:bg-zinc-700', 'active:scale-95');
+                }
+            } else if (increaseBtn && maxValue !== null) {
                 if (newValue >= maxValue) {
                     increaseBtn.disabled = true;
                     increaseBtn.classList.add('opacity-50', 'cursor-not-allowed');
@@ -512,6 +829,54 @@
 
         function adjustHope(change) {
             adjustStat('hope', change, 0, null);
+        }
+
+        function handleThresholdButton(type) {
+            const hpSlotsDisplay = document.getElementById('hpSlots-value-display');
+            if (!hpSlotsDisplay) return;
+            
+            const currentHp = parseInt(hpSlotsDisplay.textContent) || 0;
+            if (currentHp <= 0) return; // Can't deduct if HP is already 0
+            
+            let hpDeduction = 0;
+            
+            if (type === 'min') {
+                // Deduct 1 HP from HP value
+                hpDeduction = 1;
+            } else if (type === 'maj') {
+                // Deduct 2 HP from HP value
+                hpDeduction = 2;
+            } else if (type === 'sev') {
+                // Deduct 3 HP from HP value
+                hpDeduction = 3;
+            }
+            
+            if (hpDeduction > 0) {
+                // Deduct HP multiple times (one at a time to trigger all updates)
+                for (let i = 0; i < hpDeduction && currentHp - i > 0; i++) {
+                    adjustStat('hpSlots', -1, 0, null);
+                }
+            }
+        }
+
+        function resetAllStats() {
+            // Clear all saved stat values from localStorage
+            localStorage.removeItem('daggerheart_hope');
+            localStorage.removeItem('daggerheart_hpSlots');
+            localStorage.removeItem('daggerheart_armor');
+            localStorage.removeItem('daggerheart_stress');
+            
+            // Recalculate and re-render stats with defaults
+            const acInput = document.getElementById('ac');
+            const hpInput = document.getElementById('hp');
+            
+            const ac = parseInt(acInput.value) || 10;
+            const hp = parseInt(hpInput.value) || 20;
+            
+            if (ac >= 8 && hp >= 5) {
+                const stats = calculateStats(ac, hp);
+                renderResults(stats);
+            }
         }
 
         function convertStats() {
