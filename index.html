@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>D&D → Daggerheart Converter</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -46,16 +48,39 @@
         }
 
         .score-circle {
-            width: 120px;
-            height: 120px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             border: 4px solid;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3rem;
+            font-size: 2rem;
             font-weight: bold;
             margin: 0 auto;
+        }
+
+        @media (min-width: 640px) {
+            .score-circle {
+                width: 120px;
+                height: 120px;
+                font-size: 3rem;
+            }
+        }
+
+        /* Touch optimization */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        input, button {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .touch-manipulation {
+            touch-action: manipulation;
         }
 
         .score-circle.hope-higher {
@@ -96,24 +121,30 @@
 <body class="bg-zinc-950 text-zinc-200 min-h-screen">
     <!-- Header -->
     <header class="border-b border-zinc-800 bg-black/50 backdrop-blur-lg sticky top-0 z-50">
-        <div class="max-w-5xl mx-auto px-6 py-6 flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-amber-500 rounded-2xl flex items-center justify-center text-3xl shadow-lg">
-                    ⚔️
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-500 to-amber-500 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl shadow-lg">
+                        ⚔️
+                    </div>
+                    <div>
+                        <h1 class="title-font text-2xl sm:text-4xl font-bold tracking-tighter text-white">Daggerheart</h1>
+                        <p class="text-[10px] sm:text-xs text-emerald-400 -mt-1">FROM D&amp;D</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="title-font text-4xl font-bold tracking-tighter text-white">Daggerheart</h1>
-                    <p class="text-xs text-emerald-400 -mt-1">FROM D&amp;D</p>
+                <div class="w-full sm:flex-1 sm:flex sm:justify-center px-2 sm:px-4">
+                    <input 
+                        type="text" 
+                        id="character-name"
+                        placeholder="Character Name"
+                        class="w-full max-w-md bg-zinc-950/50 border border-zinc-700 focus:border-emerald-500 rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 text-lg sm:text-2xl font-bold title-font text-center text-white placeholder-zinc-500 focus:outline-none transition-all"
+                        oninput="saveToLocalStorage()">
                 </div>
             </div>
-            <!-- <div class="text-right">
-                <p class="text-sm text-zinc-400">Character Converter</p>
-                <p class="text-[10px] text-zinc-500">Level 10 • Balanced for Daggerheart</p>
-            </div> -->
         </div>
     </header>
 
-    <div class="max-w-5xl mx-auto px-6 py-12">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
         <!-- Hero -->
         <!-- <div class="text-center mb-16">
             <div class="inline-flex items-center gap-2 bg-zinc-900 border border-emerald-500/30 rounded-full px-4 py-1.5 text-sm mb-6">
@@ -130,113 +161,8 @@
             </p>
         </div> -->
 
-        <!-- Hope & Fear Dice Roller -->
-        <div class="bg-zinc-900 border border-zinc-700 rounded-3xl p-10 shadow-2xl max-w-2xl mx-auto">
-            <h2 class="text-2xl font-bold title-font mb-6 text-center text-white">
-                Hope & Fear Roll
-            </h2>
-            <div class="text-center mb-8">
-                <button 
-                    onclick="rollHopeFear()"
-                    class="bg-gradient-to-r from-white to-zinc-900 hover:from-zinc-100 hover:to-black text-white font-bold text-xl py-6 px-12 rounded-3xl transition-all duration-300 flex items-center justify-center gap-3 shadow-xl shadow-white/20 mx-auto">
-                    <i class="fa-solid fa-dice"></i>
-                    ROLL HOPE & FEAR
-                </button>
-            </div>
-            <div id="dice-results" class="hidden">
-                <div class="grid grid-cols-2 gap-6 mt-8">
-                    <div class="bg-zinc-950 border-2 border-white rounded-3xl p-8 text-center">
-                        <div class="text-sm uppercase tracking-widest text-white mb-3">HOPE</div>
-                        <div id="hope-value" class="text-6xl font-bold text-white mb-2">-</div>
-                        <div class="text-xs text-zinc-500 font-mono">D12</div>
-                    </div>
-                    <div class="bg-black border-2 border-zinc-900 rounded-3xl p-8 text-center">
-                        <div class="text-sm uppercase tracking-widest text-zinc-300 mb-3">FEAR</div>
-                        <div id="fear-value" class="text-6xl font-bold text-zinc-200 mb-2">-</div>
-                        <div class="text-xs text-zinc-500 font-mono">D12</div>
-                    </div>
-                </div>
-                
-                <!-- Icon Indicator and Total Score -->
-                <div class="mt-8 flex flex-col items-center gap-6">
-                    <!-- Icon (Skull or Dove or Lightning) -->
-                    <div id="result-icon" class="text-6xl flex items-center justify-center"></div>
-                    
-                    <!-- Critical Label -->
-                    <div id="critical-label" class="critical-label hidden"></div>
-                    
-                    <!-- Total Score Circle -->
-                    <div>
-                        <div class="text-sm uppercase tracking-widest text-zinc-400 mb-3 text-center">TOTAL SCORE</div>
-                        <div id="total-score-circle" class="score-circle"></div>
-                    </div>
-                </div>
-                
-                <div class="mt-6 text-center text-sm text-zinc-400">
-                    <div class="font-mono">
-                        Hope: <span id="hope-die" class="text-white font-bold">-</span> | 
-                        Fear: <span id="fear-die" class="text-zinc-300 font-bold">-</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Input Form -->
-        <div class="mt-16 bg-zinc-900 border border-zinc-700 rounded-3xl p-10 shadow-2xl max-w-2xl mx-auto">
-            <form id="converter-form" class="space-y-8">
-                <div class="grid grid-cols-2 gap-8">
-                    <!-- AC Input -->
-                    <div>
-                        <label class="block text-emerald-400 text-sm font-medium mb-3 flex items-center gap-2">
-                            <i class="fa-solid fa-shield-halved"></i>
-                            D&amp;D AC
-                        </label>
-                        <div class="relative">
-                            <input 
-                                type="number" 
-                                id="ac"
-                                value="21"
-                                min="8" 
-                                max="40"
-                                class="w-full bg-zinc-950 border border-zinc-700 focus:border-emerald-500 rounded-2xl px-6 py-5 text-4xl font-bold text-center focus:outline-none transition-all"
-                                oninput="liveConvert()">
-                            <div class="absolute right-6 top-1/2 -translate-y-1/2 text-xs text-zinc-500 font-mono">AC</div>
-                        </div>
-                    </div>
-
-                    <!-- HP Input -->
-                    <div>
-                        <label class="block text-emerald-400 text-sm font-medium mb-3 flex items-center gap-2">
-                            <i class="fa-solid fa-heart"></i>
-                            D&amp;D Hit Points
-                        </label>
-                        <div class="relative">
-                            <input 
-                                type="number" 
-                                id="hp"
-                                value="109"
-                                min="1" 
-                                max="999"
-                                class="w-full bg-zinc-950 border border-zinc-700 focus:border-emerald-500 rounded-2xl px-6 py-5 text-4xl font-bold text-center focus:outline-none transition-all"
-                                oninput="liveConvert()">
-                            <div class="absolute right-6 top-1/2 -translate-y-1/2 text-xs text-zinc-500 font-mono">HP</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Convert Button -->
-                <!-- <button 
-                    type="button"
-                    onclick="convertStats()"
-                    class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-black font-bold text-xl py-6 rounded-3xl transition-all duration-300 flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/30">
-                    <i class="fa-solid fa-wand-sparkles"></i>
-                    CONVERT TO DAGGERHEART
-                </button> -->
-            </form>
-        </div>
-
         <!-- Results -->
-        <div id="results" class="mt-16 hidden">
+        <div id="results" class="mt-8 sm:mt-16 hidden">
             <!-- <div class="text-center mb-8">
                 <div class="inline-flex items-center gap-3 bg-emerald-900/50 border border-emerald-500/30 rounded-full px-8 py-3">
                     <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
@@ -244,12 +170,12 @@
                 </div>
             </div> -->
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6" id="stats-grid">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6" id="stats-grid">
                 <!-- Stats populated by JS -->
             </div>
 
             <!-- Formulas -->
-            <div class="mt-16 bg-zinc-900/70 border border-zinc-700 rounded-3xl p-8">
+            <!-- <div class="mt-8 sm:mt-16 bg-zinc-900/70 border border-zinc-700 rounded-3xl p-6 sm:p-8">
                 <h3 class="text-emerald-400 text-sm uppercase tracking-widest mb-6 flex items-center gap-2">
                     <i class="fa-solid fa-book"></i>
                     CONVERSION FORMULAS
@@ -277,9 +203,13 @@
                             <div class="font-mono text-emerald-400 mb-1">ARMOR SLOTS</div>
                             <div class="text-zinc-400">round(HP Slots × 0.65)</div>
                         </div>
+                        <div>
+                            <div class="font-mono text-emerald-400 mb-1">STRESS</div>
+                            <div class="text-zinc-400">min(12, 6 + floor(HP_slots / 2))</div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
 
         <!-- Example -->
@@ -296,10 +226,138 @@
                 </button>
             </div>
         </div> -->
+
+        <!-- Hope & Fear Dice Roller -->
+        <div class="mt-8 sm:mt-16 bg-zinc-900 border border-zinc-700 rounded-3xl p-6 sm:p-10 shadow-2xl max-w-2xl mx-auto">
+            <h2 class="text-xl sm:text-2xl font-bold title-font mb-4 sm:mb-6 text-center text-white">
+                Hope & Fear Roll
+            </h2>
+            <div class="text-center mb-6 sm:mb-8">
+                <button 
+                    onclick="rollHopeFear()"
+                    class="bg-gradient-to-r from-white to-zinc-900 hover:from-zinc-100 hover:to-black active:scale-95 text-white font-bold text-base sm:text-xl py-4 sm:py-6 px-8 sm:px-12 rounded-3xl transition-all duration-300 flex items-center justify-center gap-3 shadow-xl shadow-white/20 mx-auto w-full sm:w-auto min-h-[44px] touch-manipulation">
+                    <i class="fa-solid fa-dice"></i>
+                    <span class="whitespace-nowrap">ROLL HOPE & FEAR</span>
+                </button>
+            </div>
+            <div id="dice-results" class="hidden">
+                <div class="grid grid-cols-2 gap-4 sm:gap-6 mt-6 sm:mt-8">
+                    <div class="bg-zinc-950 border-2 border-white rounded-3xl p-4 sm:p-8 text-center">
+                        <div class="text-xs sm:text-sm uppercase tracking-widest text-white mb-2 sm:mb-3">HOPE</div>
+                        <div id="hope-value" class="text-4xl sm:text-6xl font-bold text-white mb-1 sm:mb-2">-</div>
+                        <div class="text-[10px] sm:text-xs text-zinc-500 font-mono">D12</div>
+                    </div>
+                    <div class="bg-black border-2 border-zinc-900 rounded-3xl p-4 sm:p-8 text-center">
+                        <div class="text-xs sm:text-sm uppercase tracking-widest text-zinc-300 mb-2 sm:mb-3">FEAR</div>
+                        <div id="fear-value" class="text-4xl sm:text-6xl font-bold text-zinc-200 mb-1 sm:mb-2">-</div>
+                        <div class="text-[10px] sm:text-xs text-zinc-500 font-mono">D12</div>
+                    </div>
+                </div>
+                
+                <!-- Icon Indicator and Total Score -->
+                <div class="mt-6 sm:mt-8 flex flex-col items-center gap-4 sm:gap-6">
+                    <!-- Icon (Skull or Dove or Lightning) -->
+                    <div id="result-icon" class="text-4xl sm:text-6xl flex items-center justify-center"></div>
+                    
+                    <!-- Critical Label -->
+                    <div id="critical-label" class="critical-label hidden text-base sm:text-xl"></div>
+                    
+                    <!-- Total Score Circle -->
+                    <div>
+                        <div class="text-xs sm:text-sm uppercase tracking-widest text-zinc-400 mb-2 sm:mb-3 text-center">TOTAL SCORE</div>
+                        <div id="total-score-circle" class="score-circle"></div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 sm:mt-6 text-center text-xs sm:text-sm text-zinc-400">
+                    <div class="font-mono">
+                        Hope: <span id="hope-die" class="text-white font-bold">-</span> | 
+                        Fear: <span id="fear-die" class="text-zinc-300 font-bold">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Form -->
+        <div class="mt-8 sm:mt-16 bg-zinc-900 border border-zinc-700 rounded-3xl p-6 sm:p-10 shadow-2xl max-w-2xl mx-auto">
+            <form id="converter-form" class="space-y-6 sm:space-y-8">
+                <!-- Toggle Button (shown when inputs are visible) -->
+                <div id="hide-inputs-container" class="flex justify-end">
+                    <button 
+                        type="button"
+                        onclick="toggleInputsVisibility(false)"
+                        class="text-zinc-400 hover:text-zinc-200 text-xs sm:text-sm flex items-center gap-2 transition-colors touch-manipulation">
+                        <i class="fa-solid fa-eye-slash"></i>
+                        <span>Hide D&D Stats</span>
+                    </button>
+                </div>
+
+                <!-- Show Button (shown when inputs are hidden) -->
+                <div id="show-inputs-container" class="hidden">
+                    <button 
+                        type="button"
+                        onclick="toggleInputsVisibility(true)"
+                        class="w-full bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 text-zinc-200 font-medium text-sm sm:text-base py-3 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 touch-manipulation">
+                        <i class="fa-solid fa-eye"></i>
+                        <span>Show D&D Stats (AC & HP)</span>
+                    </button>
+                </div>
+
+                <!-- AC and HP Inputs -->
+                <div id="dnd-inputs-container" class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+                    <!-- AC Input -->
+                    <div>
+                        <label class="block text-emerald-400 text-xs sm:text-sm font-medium mb-2 sm:mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            D&amp;D AC
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="number" 
+                                id="ac"
+                                value="21"
+                                min="8" 
+                                max="40"
+                                class="w-full bg-zinc-950 border border-zinc-700 focus:border-emerald-500 rounded-2xl px-4 sm:px-6 py-4 sm:py-5 text-3xl sm:text-4xl font-bold text-center focus:outline-none transition-all touch-manipulation"
+                                oninput="liveConvert(); saveToLocalStorage();">
+                            <div class="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 text-xs text-zinc-500 font-mono">AC</div>
+                        </div>
+                    </div>
+
+                    <!-- HP Input -->
+                    <div>
+                        <label class="block text-emerald-400 text-xs sm:text-sm font-medium mb-2 sm:mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-heart"></i>
+                            D&amp;D Hit Points
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="number" 
+                                id="hp"
+                                value="109"
+                                min="1" 
+                                max="999"
+                                class="w-full bg-zinc-950 border border-zinc-700 focus:border-emerald-500 rounded-2xl px-4 sm:px-6 py-4 sm:py-5 text-3xl sm:text-4xl font-bold text-center focus:outline-none transition-all touch-manipulation"
+                                oninput="liveConvert(); saveToLocalStorage();">
+                            <div class="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 text-xs text-zinc-500 font-mono">HP</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Convert Button -->
+                <!-- <button 
+                    type="button"
+                    onclick="convertStats()"
+                    class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-black font-bold text-xl py-6 rounded-3xl transition-all duration-300 flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/30">
+                    <i class="fa-solid fa-wand-sparkles"></i>
+                    CONVERT TO DAGGERHEART
+                </button> -->
+            </form>
+        </div>
     </div>
 
     <!-- Footer -->
-    <footer class="border-t border-zinc-800 py-8 text-center text-xs text-zinc-500">
+    <footer class="border-t border-zinc-800 py-6 sm:py-8 text-center text-[10px] sm:text-xs text-zinc-500 px-4">
         <p>Built for the Daggerheart community • Formulas refined from playtest data</p>
         <p class="mt-2">Not affiliated with Darrington Press • For entertainment only</p>
     </footer>
@@ -313,17 +371,49 @@
             const major = 2 * hpSlots + 3;
             const severe = 2 * major;
             const armor = Math.round(hpSlots * 0.65);
+            const stress = Math.min(12, 6 + Math.floor(hpSlots / 2));
+            
+            // Load hope from localStorage or use default
+            const savedHope = localStorage.getItem('daggerheart_hope');
+            const hope = savedHope !== null ? parseInt(savedHope) : 3;
 
-            return { hpSlots, evasion, major, severe, armor };
+            return { hope, hpSlots, evasion, major, severe, armor, stress };
         }
 
         function createStatCard(title, value, icon, subtitle, color = 'emerald') {
             return `
-                <div class="stat-card bg-zinc-900 border border-zinc-700 rounded-3xl p-8 text-center group">
-                    <div class="text-5xl mb-4 opacity-80 group-hover:scale-110 transition-transform">${icon}</div>
-                    <div class="text-xs uppercase tracking-widest text-zinc-400 mb-1">${title}</div>
-                    <div class="text-6xl font-bold text-white mb-2">${value}</div>
-                    ${subtitle ? `<div class="text-[11px] text-zinc-500 font-mono">${subtitle}</div>` : ''}
+                <div class="stat-card bg-zinc-900 border border-zinc-700 rounded-3xl p-4 sm:p-8 text-center group">
+                    <div class="text-3xl sm:text-5xl mb-2 sm:mb-4 opacity-80 group-hover:scale-110 transition-transform">${icon}</div>
+                    <div class="text-[10px] sm:text-xs uppercase tracking-widest text-zinc-400 mb-1">${title}</div>
+                    <div class="text-4xl sm:text-6xl font-bold text-white mb-1 sm:mb-2">${value}</div>
+                    ${subtitle ? `<div class="text-[10px] sm:text-[11px] text-zinc-500 font-mono">${subtitle}</div>` : ''}
+                </div>
+            `;
+        }
+
+        function createHopeCard(hope) {
+            const isDisabled = hope <= 0;
+            const disabledClass = isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-zinc-700 active:scale-95';
+            const disabledAttr = isDisabled ? 'disabled' : '';
+            
+            return `
+                <div class="stat-card bg-zinc-900 border border-zinc-700 rounded-3xl p-4 sm:p-8 text-center group">
+                    <div class="text-3xl sm:text-5xl mb-2 sm:mb-4 opacity-80 group-hover:scale-110 transition-transform">🕊️</div>
+                    <div class="flex items-center justify-center gap-3 sm:gap-4 mb-2">
+                        <button 
+                            id="hope-decrease-btn"
+                            onclick="adjustHope(-1)"
+                            ${disabledAttr}
+                            class="bg-zinc-800 ${disabledClass} border border-zinc-600 text-white font-bold text-2xl sm:text-3xl w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all touch-manipulation">
+                            −
+                        </button>
+                        <div id="hope-value-display" class="text-4xl sm:text-6xl font-bold text-white min-w-[60px] sm:min-w-[80px] text-center">${hope}</div>
+                        <button 
+                            onclick="adjustHope(1)"
+                            class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-white font-bold text-2xl sm:text-3xl w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all touch-manipulation">
+                            +
+                        </button>
+                    </div>
                 </div>
             `;
         }
@@ -331,13 +421,48 @@
         function renderResults(stats) {
             const grid = document.getElementById('stats-grid');
             grid.innerHTML = `
+                ${createHopeCard(stats.hope)}
+                ${createStatCard('THRESHOLD', `${stats.major} / ${stats.severe}`, '⚡', 'Major / Severe', 'rose')}
                 ${createStatCard('HP SLOTS', stats.hpSlots, '❤️', 'Hit Point Slots', 'emerald')}
                 ${createStatCard('EVASION', stats.evasion, '🛡️', 'Defense DC', 'amber')}
-                ${createStatCard('THRESHOLD', `${stats.major} / ${stats.severe}`, '⚡', 'Major / Severe', 'rose')}
                 ${createStatCard('ARMOR', stats.armor, '🛡️', 'Armor Slots', 'sky')}
+                ${createStatCard('STRESS', stats.stress, '💥', 'Stress', 'red')}
             `;
             
             document.getElementById('results').classList.remove('hidden');
+        }
+
+        function adjustHope(change) {
+            // Ensure change is only -1 or 1
+            if (change !== -1 && change !== 1) {
+                change = change > 0 ? 1 : -1;
+            }
+            
+            const currentHope = parseInt(document.getElementById('hope-value-display').textContent) || 3;
+            const newHope = Math.max(0, currentHope + change); // Prevent negative values
+            
+            // Don't allow going below 0
+            if (newHope < 0) return;
+            
+            // Update display
+            document.getElementById('hope-value-display').textContent = newHope;
+            
+            // Update button state
+            const decreaseBtn = document.getElementById('hope-decrease-btn');
+            if (decreaseBtn) {
+                if (newHope <= 0) {
+                    decreaseBtn.disabled = true;
+                    decreaseBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    decreaseBtn.classList.remove('hover:bg-zinc-700', 'active:scale-95');
+                } else {
+                    decreaseBtn.disabled = false;
+                    decreaseBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    decreaseBtn.classList.add('hover:bg-zinc-700', 'active:scale-95');
+                }
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('daggerheart_hope', newHope.toString());
         }
 
         function convertStats() {
@@ -349,6 +474,61 @@
             
             const stats = calculateStats(ac, hp);
             renderResults(stats);
+        }
+
+        // Toggle visibility of D&D inputs
+        function toggleInputsVisibility(show) {
+            const inputsContainer = document.getElementById('dnd-inputs-container');
+            const hideButton = document.getElementById('hide-inputs-container');
+            const showButton = document.getElementById('show-inputs-container');
+            
+            if (show) {
+                inputsContainer.classList.remove('hidden');
+                hideButton.classList.remove('hidden');
+                showButton.classList.add('hidden');
+                localStorage.setItem('daggerheart_inputs_visible', 'true');
+            } else {
+                inputsContainer.classList.add('hidden');
+                hideButton.classList.add('hidden');
+                showButton.classList.remove('hidden');
+                localStorage.setItem('daggerheart_inputs_visible', 'false');
+            }
+        }
+
+        // Save data to localStorage
+        function saveToLocalStorage() {
+            const name = document.getElementById('character-name').value || '';
+            const ac = document.getElementById('ac').value || '';
+            const hp = document.getElementById('hp').value || '';
+            
+            localStorage.setItem('daggerheart_character_name', name);
+            localStorage.setItem('daggerheart_ac', ac);
+            localStorage.setItem('daggerheart_hp', hp);
+        }
+
+        // Load data from localStorage
+        function loadFromLocalStorage() {
+            const savedName = localStorage.getItem('daggerheart_character_name');
+            const savedAC = localStorage.getItem('daggerheart_ac');
+            const savedHP = localStorage.getItem('daggerheart_hp');
+            const inputsVisible = localStorage.getItem('daggerheart_inputs_visible');
+            
+            if (savedName !== null) {
+                document.getElementById('character-name').value = savedName;
+            }
+            if (savedAC !== null) {
+                document.getElementById('ac').value = savedAC;
+            }
+            if (savedHP !== null) {
+                document.getElementById('hp').value = savedHP;
+            }
+            
+            // Load visibility state (default to visible if not set)
+            if (inputsVisible === 'false') {
+                toggleInputsVisibility(false);
+            } else {
+                toggleInputsVisibility(true);
+            }
         }
 
         // Live conversion (bonus feature)
@@ -368,11 +548,8 @@
             convertStats();
         }
 
-        function rollHopeFear() {
-            // Roll 2 D12 dice
-            const hope = Math.floor(Math.random() * 12) + 1;
-            const fear = Math.floor(Math.random() * 12) + 1;
-            
+        // Display roll results
+        function displayRollResults(hope, fear, animate = false) {
             // Calculate total
             const total = hope + fear;
             
@@ -394,18 +571,33 @@
             const criticalLabelEl = document.getElementById('critical-label');
             
             if (isCritical) {
-                iconEl.innerHTML = '<span style="font-size: 4rem; display: block; color: #eab308;">⚡</span>'; // Lightning bolt
+                // Critical: check if both dice are 1-6 (Fear) or 7-12 (Hope)
+                const isCriticalWithFear = hope <= 6 && fear <= 6;
+                const isCriticalWithHope = hope >= 7 && fear >= 7;
+                
+                if (isCriticalWithFear) {
+                    // Critical with Fear: skull + lightning bolt
+                    iconEl.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;"><span class="text-4xl sm:text-6xl">💀</span><span class="text-4xl sm:text-6xl" style="color: #eab308;">⚡</span></div>';
+                    criticalLabelEl.textContent = 'CRITICAL WITH FEAR';
+                } else if (isCriticalWithHope) {
+                    // Critical with Hope: dove + lightning bolt
+                    iconEl.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;"><span class="text-4xl sm:text-6xl">🕊️</span><span class="text-4xl sm:text-6xl" style="color: #eab308;">⚡</span></div>';
+                    criticalLabelEl.textContent = 'CRITICAL WITH HOPE';
+                } else {
+                    // Fallback: just lightning bolt (shouldn't happen with D12, but just in case)
+                    iconEl.innerHTML = '<span class="text-4xl sm:text-6xl block" style="color: #eab308;">⚡</span>';
+                    criticalLabelEl.textContent = 'CRITICAL';
+                }
                 iconEl.className = 'text-6xl flex items-center justify-center';
-                criticalLabelEl.textContent = 'CRITICAL';
                 criticalLabelEl.classList.remove('hidden');
             } else {
                 criticalLabelEl.classList.add('hidden');
                 if (fearHigher) {
-                    iconEl.innerHTML = '<span style="font-size: 4rem; display: block;">💀</span>'; // Black skull
-                    iconEl.className = 'text-6xl flex items-center justify-center';
+                    iconEl.innerHTML = '<span class="text-4xl sm:text-6xl block">💀</span>'; // Black skull
+                    iconEl.className = 'text-4xl sm:text-6xl flex items-center justify-center';
                 } else if (hopeHigher) {
-                    iconEl.innerHTML = '<span style="font-size: 4rem; display: block;">🕊️</span>'; // White dove
-                    iconEl.className = 'text-6xl flex items-center justify-center';
+                    iconEl.innerHTML = '<span class="text-4xl sm:text-6xl block">🕊️</span>'; // White dove
+                    iconEl.className = 'text-4xl sm:text-6xl flex items-center justify-center';
                 }
             }
             
@@ -433,19 +625,53 @@
             // Show the results
             document.getElementById('dice-results').classList.remove('hidden');
             
-            // Add a rolling animation effect
-            const hopeEl = document.getElementById('hope-value');
-            const fearEl = document.getElementById('fear-value');
-            hopeEl.classList.remove('dice-roll-animation');
-            fearEl.classList.remove('dice-roll-animation');
-            setTimeout(() => {
-                hopeEl.classList.add('dice-roll-animation');
-                fearEl.classList.add('dice-roll-animation');
-            }, 10);
+            // Add a rolling animation effect only if animate is true
+            if (animate) {
+                const hopeEl = document.getElementById('hope-value');
+                const fearEl = document.getElementById('fear-value');
+                hopeEl.classList.remove('dice-roll-animation');
+                fearEl.classList.remove('dice-roll-animation');
+                setTimeout(() => {
+                    hopeEl.classList.add('dice-roll-animation');
+                    fearEl.classList.add('dice-roll-animation');
+                }, 10);
+            }
+        }
+
+        function rollHopeFear() {
+            // Roll 2 D12 dice
+            const hope = Math.floor(Math.random() * 12) + 1;
+            const fear = Math.floor(Math.random() * 12) + 1;
+            
+            // Save to localStorage
+            localStorage.setItem('daggerheart_last_hope', hope.toString());
+            localStorage.setItem('daggerheart_last_fear', fear.toString());
+            
+            // Display with animation
+            displayRollResults(hope, fear, true);
+        }
+
+        // Load last roll from localStorage
+        function loadLastRoll() {
+            const savedHope = localStorage.getItem('daggerheart_last_hope');
+            const savedFear = localStorage.getItem('daggerheart_last_fear');
+            
+            if (savedHope !== null && savedFear !== null) {
+                const hope = parseInt(savedHope);
+                const fear = parseInt(savedFear);
+                // Display without animation
+                displayRollResults(hope, fear, false);
+            }
         }
 
         // Auto-convert on page load with defaults
         window.onload = function() {
+            // Load saved data from localStorage
+            loadFromLocalStorage();
+            
+            // Load last roll from localStorage
+            loadLastRoll();
+            
             // Initial conversion
             setTimeout(() => {
                 convertStats();
