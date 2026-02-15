@@ -48,14 +48,14 @@
         }
 
         .score-circle {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
-            border: 4px solid;
+            border: 3px solid;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: bold;
             margin: 0 auto;
         }
@@ -116,20 +116,122 @@
             color: #eab308;
             text-shadow: 0 0 10px rgba(234, 179, 8, 0.5);
         }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #18181b 0%, #27272a 100%);
+            border: 2px solid #3f3f46;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            max-width: 90%;
+            width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .modal-message {
+            color: #a1a1aa;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .modal-button {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: 2px solid;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .modal-button-cancel {
+            background: #27272a;
+            border-color: #3f3f46;
+            color: #e4e4e7;
+        }
+
+        .modal-button-cancel:hover {
+            background: #3f3f46;
+            border-color: #52525b;
+        }
+
+        .modal-button-confirm {
+            background: #dc2626;
+            border-color: #b91c1c;
+            color: #ffffff;
+        }
+
+        .modal-button-confirm:hover {
+            background: #b91c1c;
+            border-color: #991b1b;
+        }
     </style>
 </head>
 <body class="bg-zinc-950 text-zinc-200 min-h-screen">
     <!-- Header -->
     <header class="border-b border-zinc-800 bg-black/50 backdrop-blur-lg sticky top-0 z-50">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-                <div class="w-full sm:flex-1 sm:flex sm:justify-center px-2 sm:px-4">
+        <div class="max-w-5xl mx-auto px-3 sm:px-6 py-3 sm:py-6">
+            <div class="flex flex-row items-center justify-between gap-2 sm:gap-4">
+                <div class="flex-1">
                     <input 
                         type="text" 
                         id="character-name"
                         placeholder="Character Name"
-                        class="w-full max-w-md bg-zinc-950/50 border border-zinc-700 focus:border-emerald-500 rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 text-4xl sm:text-5xl font-bold title-font text-center text-white placeholder-zinc-500 focus:outline-none transition-all"
+                        class="w-full bg-zinc-950/50 border border-zinc-700 focus:border-emerald-500 rounded-2xl px-3 sm:px-6 py-2 sm:py-3 text-3xl sm:text-5xl font-bold title-font text-center text-white placeholder-zinc-500 focus:outline-none transition-all"
                         oninput="saveToLocalStorage()">
+                </div>
+                <div class="flex-shrink-0">
+                    <button 
+                        onclick="window.location.href='dm.html'"
+                        class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-white font-bold text-sm sm:text-lg py-2 sm:py-4 px-4 sm:px-8 rounded-2xl transition-all touch-manipulation">
+                        DM
+                    </button>
                 </div>
             </div>
         </div>
@@ -161,7 +263,7 @@
                 </div>
             </div> -->
 
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6" id="stats-grid">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6" id="stats-grid">
                 <!-- Stats populated by JS -->
             </div>
 
@@ -218,23 +320,13 @@
             </div>
         </div> -->
 
-        <!-- Reset Button -->
-        <div class="mt-8 sm:mt-16 mb-6 sm:mb-8 max-w-2xl mx-auto px-4 sm:px-6">
-            <button 
-                onclick="resetAllStats()"
-                class="w-full bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-zinc-200 font-medium text-sm sm:text-base py-3 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 touch-manipulation">
-                <i class="fa-solid fa-rotate-left"></i>
-                <span>Reset All Stats</span>
-            </button>
-        </div>
-
         <!-- Hope & Fear Dice Roller -->
-        <div class="mt-8 sm:mt-16 bg-zinc-900 border border-zinc-700 rounded-3xl p-6 sm:p-10 shadow-2xl max-w-2xl mx-auto">
+        <div class="mt-6 sm:mt-16 bg-zinc-900 border border-zinc-700 rounded-3xl p-4 sm:p-10 shadow-2xl max-w-2xl mx-auto">
             <div id="dice-results" class="hidden">
                 <!-- Icon and Total Score Circle on same line -->
-                <div class="flex items-center justify-center gap-4 sm:gap-6 mb-6 sm:mb-8">
+                <div class="flex items-center justify-center gap-3 sm:gap-6 mb-4 sm:mb-8">
                     <!-- Icon (Skull or Dove or Lightning) -->
-                    <div id="result-icon" class="text-4xl sm:text-6xl flex items-center justify-center"></div>
+                    <div id="result-icon" class="text-3xl sm:text-6xl flex items-center justify-center"></div>
                     
                     <!-- Total Score Circle -->
                     <div>
@@ -242,16 +334,16 @@
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-4 sm:gap-6">
-                    <div class="bg-zinc-950 border-2 border-white rounded-3xl p-4 sm:p-8 text-center">
-                        <div class="text-xs sm:text-sm uppercase tracking-widest text-white mb-2 sm:mb-3">HOPE</div>
-                        <div id="hope-value" class="text-5xl sm:text-7xl font-bold text-white mb-1 sm:mb-2">-</div>
-                        <div class="text-[10px] sm:text-xs text-zinc-500 font-mono">D12</div>
+                <div class="grid grid-cols-2 gap-3 sm:gap-6">
+                    <div class="bg-zinc-950 border-2 border-white rounded-3xl p-3 sm:p-8 text-center">
+                        <div class="text-[10px] sm:text-sm uppercase tracking-widest text-white mb-1.5 sm:mb-3">HOPE</div>
+                        <div id="hope-value" class="text-4xl sm:text-7xl font-bold text-white mb-1 sm:mb-2">-</div>
+                        <div class="text-[9px] sm:text-xs text-zinc-500 font-mono">D12</div>
                     </div>
-                    <div class="bg-black border-2 border-zinc-900 rounded-3xl p-4 sm:p-8 text-center">
-                        <div class="text-xs sm:text-sm uppercase tracking-widest text-zinc-300 mb-2 sm:mb-3">FEAR</div>
-                        <div id="fear-value" class="text-5xl sm:text-7xl font-bold text-zinc-200 mb-1 sm:mb-2">-</div>
-                        <div class="text-[10px] sm:text-xs text-zinc-500 font-mono">D12</div>
+                    <div class="bg-black border-2 border-zinc-900 rounded-3xl p-3 sm:p-8 text-center">
+                        <div class="text-[10px] sm:text-sm uppercase tracking-widest text-zinc-300 mb-1.5 sm:mb-3">FEAR</div>
+                        <div id="fear-value" class="text-4xl sm:text-7xl font-bold text-zinc-200 mb-1 sm:mb-2">-</div>
+                        <div class="text-[9px] sm:text-xs text-zinc-500 font-mono">D12</div>
                     </div>
                 </div>
                 
@@ -355,6 +447,30 @@
         </div>
     </div>
 
+    <!-- Reset Button -->
+    <div class="mt-8 sm:mt-16 mb-6 sm:mb-8 max-w-2xl mx-auto px-4 sm:px-6">
+        <button 
+            onclick="showResetConfirmModal()"
+            class="w-full bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-zinc-200 font-medium text-sm sm:text-base py-3 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 touch-manipulation">
+            <i class="fa-solid fa-rotate-left"></i>
+            <span>Reset All Stats</span>
+        </button>
+    </div>
+
+    <!-- Reset Confirmation Modal -->
+    <div id="reset-confirm-modal" class="modal-overlay" onclick="if(event.target === this) hideResetConfirmModal()">
+        <div class="modal-content">
+            <div class="modal-title">Reset All Stats?</div>
+            <div class="modal-message">
+                Are you sure you want to reset all stats? This will restore all values to their defaults based on your current AC and HP.
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-button modal-button-cancel" onclick="hideResetConfirmModal()">Cancel</button>
+                <button class="modal-button modal-button-confirm" onclick="confirmResetStats()">Reset</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="border-t border-zinc-800 py-6 sm:py-8 text-center text-[10px] sm:text-xs text-zinc-500 px-4">
         <p>Built for the Daggerheart community • Formulas refined from playtest data</p>
@@ -441,40 +557,64 @@
             
             // For HP Slots, Stress, and Armor, show calculated value next to icon
             const iconDisplay = (id === 'hpSlots' || id === 'stress' || id === 'armor') && calculatedValue !== null
-                ? `<div class="flex items-center justify-center gap-2 mb-2 sm:mb-4">
-                    <div id="${id}-icon" class="text-3xl sm:text-5xl opacity-80 group-hover:scale-110 transition-transform" data-original-icon="${icon}">${displayIcon}</div>
-                    <div class="text-lg sm:text-xl text-zinc-400 font-mono">(${calculatedValue})</div>
+                ? `<div class="flex items-center justify-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-4">
+                    <div id="${id}-icon" class="text-2xl sm:text-5xl opacity-80 group-hover:scale-110 transition-transform" data-original-icon="${icon}">${displayIcon}</div>
+                    <div class="text-sm sm:text-xl text-zinc-400 font-mono">(${calculatedValue})</div>
                    </div>`
-                : `<div id="${id}-icon" class="text-3xl sm:text-5xl mb-2 sm:mb-4 opacity-80 group-hover:scale-110 transition-transform" data-original-icon="${icon}">${displayIcon}</div>`;
+                : `<div id="${id}-icon" class="text-2xl sm:text-5xl mb-1.5 sm:mb-4 opacity-80 group-hover:scale-110 transition-transform" data-original-icon="${icon}">${displayIcon}</div>`;
             
             return `
-                <div class="stat-card bg-zinc-900 border border-zinc-700 rounded-3xl p-4 sm:p-8 text-center group">
+                <div class="stat-card bg-zinc-900 border border-zinc-700 rounded-3xl p-3 sm:p-8 text-center group">
                     ${iconDisplay}
-                    <div class="text-[10px] sm:text-xs uppercase tracking-widest text-zinc-400 mb-1">${title}</div>
-                    <div class="flex items-center justify-center gap-3 sm:gap-4 mb-1 sm:mb-2">
+                    <div class="text-[9px] sm:text-xs uppercase tracking-widest text-zinc-400 mb-1">${title}</div>
+                    <div class="flex items-center justify-center gap-2 sm:gap-4 mb-1 sm:mb-2">
                         <button 
                             id="${id}-decrease-btn"
                             onclick="adjustStat('${id}', -1, ${minValue}, ${maxValue !== null ? maxValue : 'null'})"
                             ${minDisabledAttr}
-                            class="bg-zinc-800 ${minDisabledClass} border border-zinc-600 text-white font-bold text-2xl sm:text-3xl w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all touch-manipulation">
+                            class="bg-zinc-800 ${minDisabledClass} border border-zinc-600 text-white font-bold text-xl sm:text-3xl w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all touch-manipulation">
                             −
                         </button>
-                        <div id="${id}-value-display" class="text-4xl sm:text-6xl font-bold text-white min-w-[60px] sm:min-w-[80px] text-center">${value}</div>
+                        <div id="${id}-value-display" class="text-3xl sm:text-6xl font-bold text-white min-w-[50px] sm:min-w-[80px] text-center">${value}</div>
                         <button 
                             id="${id}-increase-btn"
                             onclick="adjustStat('${id}', 1, ${minValue}, ${maxValue !== null ? maxValue : 'null'})"
                             ${maxDisabledAttr}
-                            class="bg-zinc-800 ${maxDisabledClass} border border-zinc-600 text-white font-bold text-2xl sm:text-3xl w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all touch-manipulation">
+                            class="bg-zinc-800 ${maxDisabledClass} border border-zinc-600 text-white font-bold text-xl sm:text-3xl w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all touch-manipulation">
                             +
                         </button>
                     </div>
-                    ${subtitle ? `<div class="text-[10px] sm:text-[11px] text-zinc-500 font-mono">${subtitle}</div>` : ''}
+                    ${subtitle ? `<div class="text-[9px] sm:text-[11px] text-zinc-500 font-mono">${subtitle}</div>` : ''}
                 </div>
             `;
         }
 
         function createHopeCard(hope) {
-            return createInteractiveStatCard('hope', hope, '🕊️', '', '', 0, null);
+            const isMinDisabled = hope <= 0;
+            const minDisabledClass = isMinDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-zinc-700 active:scale-95';
+            const minDisabledAttr = isMinDisabled ? 'disabled' : '';
+            
+            return `
+                <div class="stat-card bg-zinc-900 border border-zinc-700 rounded-3xl p-3 sm:p-8 text-center group">
+                    <div id="hope-icon" class="text-2xl sm:text-5xl mb-1.5 sm:mb-4 opacity-80 group-hover:scale-110 transition-transform" data-original-icon="🕊️">🕊️</div>
+                    <div class="flex items-center justify-center gap-2 sm:gap-4 mb-1 sm:mb-2">
+                        <button 
+                            id="hope-decrease-btn"
+                            onclick="adjustHope(-1)"
+                            ${minDisabledAttr}
+                            class="bg-zinc-800 ${minDisabledClass} border border-zinc-600 text-white font-bold text-xl sm:text-3xl w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all touch-manipulation">
+                            −
+                        </button>
+                        <div id="hope-value-display" class="text-3xl sm:text-6xl font-bold text-white min-w-[50px] sm:min-w-[80px] text-center">${hope}</div>
+                        <button 
+                            id="hope-increase-btn"
+                            onclick="adjustHope(1)"
+                            class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-white font-bold text-xl sm:text-3xl w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all touch-manipulation">
+                            +
+                        </button>
+                    </div>
+                </div>
+            `;
         }
 
         function updateAllIconsForHpSlots(hpSlotsValue) {
@@ -510,25 +650,25 @@
             if (!buttonSection) {
                 buttonSection = document.createElement('div');
                 buttonSection.id = 'threshold-buttons-section';
-                buttonSection.className = 'mb-6 sm:mb-8 flex items-center justify-center gap-3 sm:gap-6 flex-wrap';
+                buttonSection.className = 'mb-4 sm:mb-8 flex items-center justify-center gap-2 sm:gap-6 flex-wrap';
                 resultsContainer.insertBefore(buttonSection, grid);
             }
             buttonSection.innerHTML = `
                 <button 
                     onclick="handleThresholdButton('min')"
-                    class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-white font-bold text-base sm:text-lg py-3 sm:py-4 px-6 sm:px-8 rounded-2xl transition-all touch-manipulation">
+                    class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-white font-bold text-sm sm:text-lg py-2 sm:py-4 px-4 sm:px-8 rounded-2xl transition-all touch-manipulation">
                     Min
                 </button>
-                <div class="text-2xl sm:text-3xl font-bold text-white min-w-[40px] sm:min-w-[60px] text-center" id="threshold-major-value">${stats.major}</div>
+                <div class="text-xl sm:text-3xl font-bold text-white min-w-[35px] sm:min-w-[60px] text-center" id="threshold-major-value">${stats.major}</div>
                 <button 
                     onclick="handleThresholdButton('maj')"
-                    class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-white font-bold text-base sm:text-lg py-3 sm:py-4 px-6 sm:px-8 rounded-2xl transition-all touch-manipulation">
+                    class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-white font-bold text-sm sm:text-lg py-2 sm:py-4 px-4 sm:px-8 rounded-2xl transition-all touch-manipulation">
                     Maj
                 </button>
-                <div class="text-2xl sm:text-3xl font-bold text-white min-w-[40px] sm:min-w-[60px] text-center" id="threshold-severe-value">${stats.severe}</div>
+                <div class="text-xl sm:text-3xl font-bold text-white min-w-[35px] sm:min-w-[60px] text-center" id="threshold-severe-value">${stats.severe}</div>
                 <button 
                     onclick="handleThresholdButton('sev')"
-                    class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-white font-bold text-base sm:text-lg py-3 sm:py-4 px-6 sm:px-8 rounded-2xl transition-all touch-manipulation">
+                    class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-white font-bold text-sm sm:text-lg py-2 sm:py-4 px-4 sm:px-8 rounded-2xl transition-all touch-manipulation">
                     Sev
                 </button>
             `;
@@ -857,6 +997,25 @@
                     adjustStat('hpSlots', -1, 0, null);
                 }
             }
+        }
+
+        function showResetConfirmModal() {
+            const modal = document.getElementById('reset-confirm-modal');
+            if (modal) {
+                modal.classList.add('show');
+            }
+        }
+
+        function hideResetConfirmModal() {
+            const modal = document.getElementById('reset-confirm-modal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+
+        function confirmResetStats() {
+            hideResetConfirmModal();
+            resetAllStats();
         }
 
         function resetAllStats() {

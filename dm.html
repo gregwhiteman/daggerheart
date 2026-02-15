@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>DM - Daggerheart</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Playfair+Display:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .title-font {
+            font-family: 'UnifrakturCook', cursive;
+        }
+
+        /* Touch optimization */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        input, button {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .touch-manipulation {
+            touch-action: manipulation;
+        }
+
+        .stat-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5);
+        }
+
+        @keyframes diceRoll {
+            0% { transform: scale(0.8) rotate(-10deg); opacity: 0.5; }
+            50% { transform: scale(1.1) rotate(10deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .dice-roll-animation {
+            animation: diceRoll 0.5s ease-out;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #18181b 0%, #27272a 100%);
+            border: 2px solid #3f3f46;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            max-width: 90%;
+            width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .modal-message {
+            color: #a1a1aa;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .modal-button {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: 2px solid;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .modal-button-cancel {
+            background: #27272a;
+            border-color: #3f3f46;
+            color: #e4e4e7;
+        }
+
+        .modal-button-cancel:hover {
+            background: #3f3f46;
+            border-color: #52525b;
+        }
+
+        .modal-button-confirm {
+            background: #dc2626;
+            border-color: #b91c1c;
+            color: #ffffff;
+        }
+
+        .modal-button-confirm:hover {
+            background: #b91c1c;
+            border-color: #991b1b;
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-200 min-h-screen">
+    <!-- Header -->
+    <header class="border-b border-zinc-800 bg-black/50 backdrop-blur-lg sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-3 sm:px-6 py-3 sm:py-6">
+            <div class="flex flex-row items-center justify-between gap-2 sm:gap-4">
+                <div class="flex-1">
+                    <input 
+                        type="text" 
+                        id="character-name"
+                        placeholder="Character Name"
+                        class="w-full bg-zinc-950/50 border border-zinc-700 focus:border-emerald-500 rounded-2xl px-3 sm:px-6 py-2 sm:py-3 text-3xl sm:text-5xl font-bold title-font text-center text-white placeholder-zinc-500 focus:outline-none transition-all"
+                        oninput="saveToLocalStorage()">
+                </div>
+                <div class="flex-shrink-0">
+                    <button 
+                        onclick="window.history.back()"
+                        class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-white font-bold text-sm sm:text-lg py-2 sm:py-4 px-4 sm:px-8 rounded-2xl transition-all touch-manipulation">
+                        &lt;
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-5xl mx-auto px-3 sm:px-6 py-0 sm:py-0">
+        <!-- DM Content -->
+        <div class="mt-8 sm:mt-16">
+            <!-- D20 Roll and Fear Sections -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6">
+                <!-- D20 Roll Section -->
+                <div class="stat-card bg-zinc-900 border border-zinc-700 rounded-3xl p-3 sm:p-8 text-center group">
+                    <div class="text-5xl sm:text-9xl mb-1 sm:mb-2 opacity-80 group-hover:scale-110 transition-transform">🎲</div>
+                    <div class="text-[9px] sm:text-xs uppercase tracking-widest text-zinc-400 mb-1 sm:mb-2">D20 ROLL</div>
+                    <div id="d20-result" class="text-3xl sm:text-6xl font-bold text-white mb-2 sm:mb-4 min-h-[50px] sm:min-h-[70px] flex items-center justify-center">-</div>
+                    <button 
+                        onclick="rollD20()"
+                        class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-zinc-200 font-medium text-sm sm:text-base py-3 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 touch-manipulation mx-auto w-full sm:w-auto">
+                        <i class="fa-solid fa-dice"></i>
+                        <span>Roll D20</span>
+                    </button>
+                </div>
+
+                <!-- Fear Section -->
+                <div class="stat-card bg-zinc-900 border border-zinc-700 rounded-3xl p-3 sm:p-8 text-center group">
+                    <div id="fear-icon" class="text-5xl sm:text-9xl mb-1 sm:mb-2 opacity-80 group-hover:scale-110 transition-transform" data-original-icon="💀">💀</div>
+                    <div class="text-[9px] sm:text-xs uppercase tracking-widest text-zinc-400 mb-1 sm:mb-2">FEAR</div>
+                    <div class="flex items-center justify-center gap-2 sm:gap-4 mb-2 sm:mb-4 min-h-[50px] sm:min-h-[70px]">
+                        <button 
+                            id="fear-decrease-btn"
+                            onclick="adjustFear(-1)"
+                            class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-white font-bold text-xl sm:text-3xl w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all touch-manipulation">
+                            −
+                        </button>
+                        <div id="fear-value-display" class="text-3xl sm:text-6xl font-bold text-white min-w-[50px] sm:min-w-[80px] text-center">0</div>
+                        <button 
+                            id="fear-increase-btn"
+                            onclick="adjustFear(1)"
+                            class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-white font-bold text-xl sm:text-3xl w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all touch-manipulation">
+                            +
+                        </button>
+                    </div>
+                    <button 
+                        onclick="showResetFearModal()"
+                        class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 border border-zinc-600 text-zinc-200 font-medium text-sm sm:text-base py-3 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 touch-manipulation mx-auto w-full sm:w-auto">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        <span>Reset</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Fear Confirmation Modal -->
+    <div id="reset-fear-modal" class="modal-overlay" onclick="if(event.target === this) hideResetFearModal()">
+        <div class="modal-content">
+            <div class="modal-title">Reset Fear?</div>
+            <div class="modal-message">
+                Are you sure you want to reset Fear to 0?
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-button modal-button-cancel" onclick="hideResetFearModal()">Cancel</button>
+                <button class="modal-button modal-button-confirm" onclick="confirmResetFear()">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load character name from localStorage
+        function loadFromLocalStorage() {
+            const savedName = localStorage.getItem('daggerheart_character_name');
+            if (savedName) {
+                const nameInput = document.getElementById('character-name');
+                if (nameInput) {
+                    nameInput.value = savedName;
+                }
+            }
+            
+            // Load Fear value from localStorage
+            const savedFear = localStorage.getItem('daggerheart_fear');
+            const fearDisplay = document.getElementById('fear-value-display');
+            if (fearDisplay) {
+                const fearValue = savedFear !== null ? parseInt(savedFear) : 0;
+                fearDisplay.textContent = fearValue;
+                updateFearButtonStates(fearValue);
+            }
+        }
+
+        // Save character name to localStorage
+        function saveToLocalStorage() {
+            const nameInput = document.getElementById('character-name');
+            if (nameInput) {
+                localStorage.setItem('daggerheart_character_name', nameInput.value);
+            }
+        }
+
+        // Adjust Fear value
+        function adjustFear(change) {
+            const displayEl = document.getElementById('fear-value-display');
+            if (!displayEl) return;
+            
+            const currentValue = parseInt(displayEl.textContent) || 0;
+            let newValue = currentValue + change;
+            
+            // Ensure minimum value of 0
+            if (newValue < 0) return;
+            
+            // Update display
+            displayEl.textContent = newValue;
+            
+            // Update button states
+            updateFearButtonStates(newValue);
+            
+            // Save to localStorage
+            localStorage.setItem('daggerheart_fear', newValue.toString());
+        }
+
+        // Update Fear button states
+        function updateFearButtonStates(value) {
+            const decreaseBtn = document.getElementById('fear-decrease-btn');
+            const increaseBtn = document.getElementById('fear-increase-btn');
+            
+            if (decreaseBtn) {
+                if (value <= 0) {
+                    decreaseBtn.disabled = true;
+                    decreaseBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    decreaseBtn.classList.remove('hover:bg-zinc-700', 'active:scale-95');
+                } else {
+                    decreaseBtn.disabled = false;
+                    decreaseBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    decreaseBtn.classList.add('hover:bg-zinc-700', 'active:scale-95');
+                }
+            }
+        }
+
+        // Show Reset Fear confirmation modal
+        function showResetFearModal() {
+            const modal = document.getElementById('reset-fear-modal');
+            if (modal) {
+                modal.classList.add('show');
+            }
+        }
+
+        // Hide Reset Fear confirmation modal
+        function hideResetFearModal() {
+            const modal = document.getElementById('reset-fear-modal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+
+        // Confirm Reset Fear
+        function confirmResetFear() {
+            hideResetFearModal();
+            resetFear();
+        }
+
+        // Reset Fear to 0
+        function resetFear() {
+            const displayEl = document.getElementById('fear-value-display');
+            if (!displayEl) return;
+            
+            // Reset to 0
+            displayEl.textContent = 0;
+            
+            // Update button states
+            updateFearButtonStates(0);
+            
+            // Save to localStorage
+            localStorage.setItem('daggerheart_fear', '0');
+        }
+
+        // Roll D20
+        function rollD20() {
+            // Roll a D20
+            const result = Math.floor(Math.random() * 20) + 1;
+            
+            // Get the result display element
+            const resultEl = document.getElementById('d20-result');
+            if (!resultEl) return;
+            
+            // Add animation class
+            resultEl.classList.remove('dice-roll-animation');
+            setTimeout(() => {
+                resultEl.classList.add('dice-roll-animation');
+            }, 10);
+            
+            // Update display
+            resultEl.textContent = result;
+            
+            // Save to localStorage
+            localStorage.setItem('daggerheart_last_d20', result.toString());
+        }
+
+        // Load last D20 roll from localStorage
+        function loadLastD20Roll() {
+            const savedD20 = localStorage.getItem('daggerheart_last_d20');
+            const resultEl = document.getElementById('d20-result');
+            if (resultEl && savedD20 !== null) {
+                resultEl.textContent = savedD20;
+            }
+        }
+
+        // Load on page load
+        window.onload = function() {
+            loadFromLocalStorage();
+            loadLastD20Roll();
+        };
+    </script>
+</body>
+</html>
